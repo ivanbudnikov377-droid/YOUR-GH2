@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <title>YOUR GC - Line Assistant</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YOUR GC">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- СОВРЕМЕННАЯ ЗАСТАВКА -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-glow-bg">
+            <div class="glow-orb orb-yellow"></div>
+            <div class="glow-orb orb-dark"></div>
+        </div>
+        <div id="splash-particles" class="splash-particles"></div>
+        <div class="splash-content">
+            <div class="splash-logo-box">
+                <h1 class="splash-title-top">YOUR</h1>
+                <div class="splash-logo-gc">
+                    <span class="logo-g">G</span><span class="logo-c">C</span>
+                </div>
+                <div class="splash-subtitle">GLOBAL CHEMICAL</div>
+            </div>
+            <div class="splash-loader-wrap">
+                <div class="splash-loader-bar"></div>
+                <div class="splash-hint">НАЖМИТЕ, ЧТОБЫ ПРОДОЛЖИТЬ</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+    <div class="hmi-container hidden hub-mode" id="main-app">
+        
+        <!-- ЛЕВОЕ МЕНЮ (На телефоне станет нижним) -->
+        <nav class="hmi-sidebar" id="hmi-sidebar">
+            <div class="hmi-nav-group" id="fill-nav">
+                <button id="nav-fill-inputs" class="hmi-nav-btn active" title="Замеры налива" onclick="switchTab('inputs', event)">
+                    <svg viewBox="0 0 24 24"><path d="M19.77,14.23l-4.5-4.5c-0.39-0.39-1.02-0.39-1.41,0l-2.5,2.5c-0.39,0.39-0.39,1.02,0,1.41l4.5,4.5 c0.39,0.39,1.02,0.39,1.41,0L19.77,15.64C20.16,15.25,20.16,14.62,19.77,14.23z M8.23,17.77l-2.5-2.5 c-0.39-0.39-0.39-1.02,0-1.41l4.5-4.5c0.39-0.39,1.02-0.39,1.41,0l2.5,2.5c0.39,0.39,0.39,1.02,0,1.41l-4.5,4.5 C9.25,18.16,8.62,18.16,8.23,17.77z"/></svg>
+                </button>
+                <button id="nav-fill-bottle" class="hmi-nav-btn" title="Настройки налива" onclick="switchTab('bottle', event)">
+                    <svg viewBox="0 0 24 24"><path d="M10,2h4v2h-4V2z M15,4v5l2.5,4.5c0.3,0.6,0.5,1.2,0.5,1.9V20c0,1.1-0.9,2-2,2H8c-1.1,0-2-0.9-2-2v-4.6 c0-0.7,0.2-1.3,0.5-1.9L9,9V4H15z"/></svg>
+                </button>
+                <button id="nav-fill-nozzles" class="hmi-nav-btn" title="Форсунки" onclick="switchTab('nozzles', event)">
+                    <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                </button>
+                <button id="nav-fill-settings" class="hmi-nav-btn" title="Настройки линии" onclick="switchTab('settings', event)">
+                    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                </button>
+                <button id="nav-fill-checklist" class="hmi-nav-btn hmi-nav-btn-labeled" title="📋 Памятка наладчика / Оператора" onclick="switchTab('fill-checklist', event)">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-2 5h8v2H10V8zm0 4h8v2H10v-2zm0 4h5v2h-5v-2z"/></svg>
+                    <span class="hmi-nav-label">ПАМЯТКА</span>
+                </button>
+            </div>
+
+            <div class="hmi-nav-group hidden" id="capper-nav">
+                <button id="nav-capper-inputs" class="hmi-nav-btn hmi-nav-btn-labeled" title="Замеры укупора" onclick="switchTab('capper-inputs', event)">
+                    <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+                    <span class="hmi-nav-label">ЗАМЕРЫ</span>
+                </button>
+                <button id="nav-capper-timings" class="hmi-nav-btn hmi-nav-btn-labeled" title="Укупор (Тайминги)" onclick="switchTab('capper-timings', event)">
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    <span class="hmi-nav-label">ТАЙМИНГИ</span>
+                </button>
+                <button id="nav-capper-sensors" class="hmi-nav-btn hmi-nav-btn-labeled" title="Датчики и Пневматика" onclick="switchTab('capper-sensors', event)">
+                    <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+                    <span class="hmi-nav-label">ДАТЧИКИ<br>ПНЕВМ.</span>
+                </button>
+                <button id="nav-capper-checklist" class="hmi-nav-btn hmi-nav-btn-labeled" title="📋 Памятка наладчика / Оператора" onclick="switchTab('capper-checklist', event)">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-2 5h8v2H10V8zm0 4h8v2H10v-2zm0 4h5v2h-5v-2z"/></svg>
+                    <span class="hmi-nav-label">ПАМЯТКА</span>
+                </button>
+            </div>
+
+            <div class="hmi-nav-group hidden" id="labeler-nav">
+                <button id="nav-labeler-inputs" class="hmi-nav-btn hmi-nav-btn-labeled" title="Замеры и Приборы" onclick="switchTab('labeler-inputs', event)">
+                    <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+                    <span class="hmi-nav-label">ЗАМЕРЫ</span>
+                </button>
+                <button id="nav-labeler-panel" class="hmi-nav-btn hmi-nav-btn-labeled" title="Панель Kinco" onclick="switchTab('labeler-panel', event)">
+                    <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+                    <span class="hmi-nav-label">KINCO</span>
+                </button>
+                <button id="nav-labeler-notes" class="hmi-nav-btn hmi-nav-btn-labeled" title="📋 Памятка наладчика" onclick="switchTab('labeler-notes', event)">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-2 5h8v2H10V8zm0 4h8v2H10v-2zm0 4h5v2h-5v-2z"/></svg>
+                    <span class="hmi-nav-label">ПАМЯТКА</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ПРАВАЯ ЧАСТЬ -->
+        <main class="hmi-main-content">
+            
+            <!-- ФОН С НЕОНОВЫМИ ГЕОМЕТРИЧЕСКИМИ ФИГУРАМИ -->
+            <div class="hmi-bg-decor">
+                <svg class="neon-shape hex-1" viewBox="0 0 100 100">
+                    <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
+                </svg>
+                <svg class="neon-shape hex-2" viewBox="0 0 100 100">
+                    <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
+                </svg>
+                <svg class="neon-shape hex-3" viewBox="0 0 100 100">
+                    <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
+                </svg>
+                
+                <svg class="neon-shape tri-1" viewBox="0 0 100 100">
+                    <polygon points="50,10 90,90 10,90" />
+                </svg>
+                <svg class="neon-shape tri-2" viewBox="0 0 100 100">
+                    <polygon points="50,10 90,90 10,90" />
+                </svg>
+                <svg class="neon-shape tri-3" viewBox="0 0 100 100">
+                    <polygon points="50,10 90,90 10,90" />
+                </svg>
+                <svg class="neon-shape tri-4" viewBox="0 0 100 100">
+                    <polygon points="50,10 90,90 10,90" />
+                </svg>
+            </div>
+
+            <header class="hmi-header">
+                <div class="hmi-header-brand">
+                    <div class="hmi-header-logo">YOUR <span class="logo-yellow">G</span>C</div>
+                    <button id="btn-hub" class="hmi-hub-back-btn active" onclick="showHub()" title="Вернуться к выбору узла линии">☰ УЗЛЫ ЛИНИИ</button>
+                    <div id="hmi-global-line" class="hmi-global-line" title="1 линия · 21w кольцо">1 ЛИНИЯ · 21W</div>
+                    <button id="btn-install" class="hmi-install-btn hidden" onclick="installPwa()" title="Установить приложение на экран">📲 <span class="hmi-install-label">УСТАНОВИТЬ</span></button>
+                </div>
+                <button class="hmi-stop-btn" title="СТОП">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                </button>
+                <div class="hmi-clock">
+                    <div id="hmi-date">--.--.----</div>
+                    <div id="hmi-time">--:--:--</div>
+                </div>
+            </header>
+
+            <div class="hmi-workspace">
+                
+                <!-- 0. ЭКРАН ВЫБОРА УЗЛА ЛИНИИ -->
+                <div id="screen-hub" class="hmi-screen active">
+                    <div class="hmi-hub-wrap">
+                        <div class="hmi-hub-heading">
+                            <div class="hmi-hub-kicker">GLOBAL CHEMICAL · LINE ASSISTANT</div>
+                            <h1 class="hmi-hub-title">ВЫБЕРИТЕ УЗЕЛ ЛИНИИ</h1>
+                            <p class="hmi-hub-subtitle">Сначала выберите рабочую линию, затем откройте нужный узел. Выбор линии действует во всех модулях.</p>
+                        </div>
+
+                        <div class="hmi-line-selector-wrap">
+                            <div class="hmi-line-selector-label">Рабочая линия</div>
+                            <div class="hmi-line-selector" role="tablist" aria-label="Рабочая линия">
+                                <button type="button" class="hmi-line-option active" data-line="line1" aria-selected="true" onclick="selectGlobalLine('line1')">
+                                    <span class="hmi-line-option-code">01</span>
+                                    <span class="hmi-line-option-body"><b>1 линия · 21w кольцо</b><small>Кольцевой налив · 12 форсунок</small></span>
+                                    <span class="hmi-line-option-check">✓</span>
+                                </button>
+                                <button type="button" class="hmi-line-option" data-line="line2" aria-selected="false" onclick="selectGlobalLine('line2')">
+                                    <span class="hmi-line-option-code">02</span>
+                                    <span class="hmi-line-option-body"><b>2 линия · 22w прямая</b><small>Прямая линия · 22 позиции</small></span>
+                                    <span class="hmi-line-option-check">✓</span>
+                                </button>
+                                <button type="button" class="hmi-line-option" data-line="line3" aria-selected="false" onclick="selectGlobalLine('line3')">
+                                    <span class="hmi-line-option-code">03</span>
+                                    <span class="hmi-line-option-body"><b>3 линия · прямая АЛР цех 5</b><small>Прямая АЛР · цех 5</small></span>
+                                    <span class="hmi-line-option-check">✓</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="hmi-hub-recipes">
+                            <div class="hmi-hub-recipes-head">
+                                <span class="hmi-hub-recipes-title">💾 Сохранённые рецепты</span>
+                                <span class="hmi-recipe-count" id="hub_recipes_count">0</span>
+                            </div>
+                            <div class="hmi-hub-recipes-preview" id="hub_recipes_preview">Пока нет сохранённых рецептов</div>
+                            <div class="hmi-hub-recipes-actions">
+                                <button type="button" class="hmi-recipe-btn" onclick="openRecipesModal('all')">Открыть базу</button>
+                                <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="exportRecipes()">Экспорт JSON</button>
+                                <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="triggerRecipeImport()">Импорт JSON</button>
+                            </div>
+                        </div>
+
+                        <div class="hmi-hub-grid">
+                            <button type="button" class="hmi-hub-card" onclick="openModule('fill')">
+                                <div class="hmi-hub-card-top">
+                                    <div class="hmi-hub-card-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M10 2h4v2h-4V2zm5 2v5l2.5 4.5c.3.6.5 1.2.5 1.9V20c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-4.6c0-.7.2-1.3.5-1.9L9 9V4h6z"/></svg>
+                                    </div>
+                                    <span class="hmi-hub-status hmi-hub-status-on">АКТИВЕН</span>
+                                </div>
+                                <div class="hmi-hub-card-title">БЛОК НАЛИВА</div>
+                                <div class="hmi-hub-card-sub">21W КОЛЬЦО · 12 ФОРСУНОК</div>
+                                <div class="hmi-hub-card-desc">Пневматический налив, давление в баке, сервомеханика штоков и индивидуальные Kp форсунок.</div>
+                                <div class="hmi-hub-card-footer"><span>ОТКРЫТЬ МОДУЛЬ</span><span class="hmi-hub-arrow">→</span></div>
+                            </button>
+
+                            <button type="button" class="hmi-hub-card" onclick="openModule('capper')">
+                                <div class="hmi-hub-card-top">
+                                    <div class="hmi-hub-card-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M6 3h12l1 5H5l1-5zm-1 7h14l1 11H4L5 10zm4 3v5h6v-5H9z"/></svg>
+                                    </div>
+                                    <span class="hmi-hub-status hmi-hub-status-on">АКТИВЕН</span>
+                                </div>
+                                <div class="hmi-hub-card-title">БЛОК УКУПОРА</div>
+                                <div class="hmi-hub-card-sub">ПАККА · CAMOZZI · DELTA</div>
+                                <div class="hmi-hub-card-desc">Роликовый серво-укупор: тайминги голов, отсекатели, датчики и пневмозажимы тары.</div>
+                                <div class="hmi-hub-card-footer"><span>ОТКРЫТЬ МОДУЛЬ</span><span class="hmi-hub-arrow">→</span></div>
+                            </button>
+
+                            <button type="button" class="hmi-hub-card" onclick="openModule('labeler')">
+                                <div class="hmi-hub-card-top">
+                                    <div class="hmi-hub-card-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M21.4 11.6l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7c0 .5.2 1 .6 1.4l9 9a2 2 0 0 0 2.8 0l7-7a2 2 0 0 0 0-2.8zM7 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                                    </div>
+                                    <span class="hmi-hub-status hmi-hub-status-on">АКТИВЕН</span>
+                                </div>
+                                <div class="hmi-hub-card-title">ЭТИКЕТИРОВЩИК</div>
+                                <div class="hmi-hub-card-sub">СИКОМ · GREEN SERIES · KINCO</div>
+                                <div class="hmi-hub-card-desc">Круговая обкатка и двухсторонняя оклейка: тахометр, инклинометр, угломер ножа и тайминги панели Kinco.</div>
+                                <div class="hmi-hub-card-footer"><span>ОТКРЫТЬ МОДУЛЬ</span><span class="hmi-hub-arrow">→</span></div>
+                            </button>
+
+                            <button type="button" class="hmi-hub-card hmi-hub-card-sim" onclick="openSimulator()">
+                                <div class="hmi-hub-card-top">
+                                    <div class="hmi-hub-card-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M21.58 16.09l-1.09-7.66A3.996 3.996 0 0 0 16.53 5H7.47a3.996 3.996 0 0 0-3.96 3.43L2.42 16.09A3 3 0 0 0 5.38 19.5c.81 0 1.59-.32 2.17-.9L10 16h4l2.45 2.6c.58.58 1.36.9 2.17.9a3 3 0 0 0 2.96-3.41zM9 11H7v2H6v-2H4V10h2V8h1v2h2v1zm6.5 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm2-3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+                                    </div>
+                                    <span class="hmi-hub-status hmi-hub-status-sim">ТРЕНАЖЁР</span>
+                                </div>
+                                <div class="hmi-hub-card-title">🎮 СИМУЛЯТОР НАЛАДКИ</div>
+                                <div class="hmi-hub-card-sub">ТРЕНАЖЁР · 3 РЕЖИМА</div>
+                                <div class="hmi-hub-card-desc">Реальные модели налива, укупора и этикетировщика. Случайные задания, таймер, разбор ошибок и звания.</div>
+                                <div class="hmi-hub-card-footer"><span>НАЧАТЬ ТРЕНИРОВКУ</span><span class="hmi-hub-arrow">→</span></div>
+                            </button>
+                        </div>
+
+                        <div class="hmi-hub-footer">
+                            <span id="hub_footer_line">1 ЛИНИЯ · 21W КОЛЬЦО</span>
+                            <span>DELTA HMI · GLOBAL CHEMICAL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1. ЭКРАН ЗАМЕРОВ -->
+                <div id="screen-inputs" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Исходные данные</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-inputs-container">
+                            <h3 class="hmi-section-title">Выбор оборудования</h3>
+                            <input type="hidden" id="input_line" value="line1">
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Рабочая линия</label>
+                                <div id="fill_line_readout" class="hmi-line-readout">1 линия · 21w кольцо</div>
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Диаметр сопел</label>
+                                <select id="input_nozzle_diameter" class="hmi-input hmi-select">
+                                    <option value="0.006">6 мм</option>
+                                    <option value="0.008">8 мм</option>
+                                    <option value="0.014">14 мм</option>
+                                </select>
+                            </div>
+
+                            <h3 class="hmi-section-title">1. Замеры тары</h3>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Объем флакона, мл</label>
+                                <input type="number" id="input_bottle_volume" class="hmi-input" value="1000" step="1" oninput="updateVolumePreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Высота флакона, мм</label>
+                                <input type="number" id="input_height" class="hmi-input" value="238" step="1">
+                            </div>
+                            
+                            <h3 class="hmi-section-title">2. Замеры продукта</h3>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Целевой вес нетто, г</label>
+                                <input type="number" id="input_weight" class="hmi-input" value="880" step="0.1" oninput="updateVolumePreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Плотность, г/мл</label>
+                                <input type="number" id="input_density" class="hmi-input" value="1.034" step="0.001" oninput="updateVolumePreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Вязкость, ед. (сП)</label>
+                                <input type="number" id="input_viscosity" class="hmi-input" value="1957" step="1">
+                            </div>
+
+                            <div class="hmi-calc-box" style="margin-top: 20px; text-align: center;">
+                                <div class="hmi-calc-row" style="justify-content: center; flex-direction: column;">
+                                    <span>Расчетный объем дозы:</span>
+                                    <strong id="calc_volume_result" style="font-size: 32px;">851.0 мл</strong>
+                                </div>
+                            </div>
+
+                            <button class="hmi-btn-generate" onclick="generateRecipeFromInputs()" style="margin-top: 20px;">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                                Сгенерировать настройки
+                            </button>
+
+                            <div class="hmi-recipe-panel">
+                                <div class="hmi-recipe-panel-head">
+                                    <span>💾 Сохранённые рецепты</span>
+                                    <span class="hmi-recipe-count" id="fill_recipes_count">0</span>
+                                </div>
+                                <div class="hmi-recipe-panel-note">Сохраните проверенные настройки продукта на этом устройстве.</div>
+                                <div class="hmi-recipe-panel-actions">
+                                    <input type="text" id="recipe_name_fill" class="hmi-recipe-name" placeholder="Название продукта" maxlength="60">
+                                    <button type="button" class="hmi-recipe-btn" onclick="saveCurrentRecipe('fill')">Сохранить</button>
+                                    <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="openRecipesModal('fill')">База</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. ЭКРАН НАСТРОЙКИ НАЛИВА -->
+                <div id="screen-bottle" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Настройки налива</div>
+                    <div class="hmi-form-container">
+                        <div style="width: 100%; display: flex; flex-direction: column; gap: 15px;">
+                            <div class="hmi-form-row">
+                                <input type="number" id="bottle_delay" class="hmi-input" value="0.01" step="0.01">
+                                <label class="hmi-label" style="border-left-color: var(--hmi-accent);">Сек &nbsp; Задержка подъема сопел</label>
+                            </div>
+                            <div class="hmi-form-row">
+                                <input type="number" id="bottle_max_time" class="hmi-input" value="30.00" step="0.1">
+                                <label class="hmi-label" style="border-left-color: var(--hmi-accent);">Сек &nbsp; Допустимое время цикла налива</label>
+                            </div>
+                            <div class="hmi-form-row">
+                                <input type="number" id="bottle_input_dose" class="hmi-input" value="851.0" step="0.1">
+                                <label class="hmi-label" style="border-left-color: var(--hmi-accent);">Доза/мл</label>
+                            </div>
+                            <button class="hmi-big-btn" onclick="switchTab('nozzles', event)" style="margin-top: 20px;">
+                                Индивидуальные настройки форсунок
+                                <svg viewBox="0 0 24 24" class="hmi-arrow-right"><path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. ЭКРАН ФОРСУНОК -->
+                <div id="screen-nozzles" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Настройки форсунок</div>
+                    <div class="hmi-nozzles-layout">
+                        <div class="hmi-nozzles-list" id="nozzles-list-container"></div>
+                        <div class="hmi-nozzles-graphic">
+                            <div class="hmi-manifold">
+                                <div class="hmi-manifold-label">1LKC</div>
+                                <div class="hmi-pipe"></div><div class="hmi-pipe"></div><div class="hmi-pipe"></div>
+                                <div class="hmi-pipe"></div><div class="hmi-pipe"></div><div class="hmi-pipe"></div>
+                                <div class="hmi-pipe"></div><div class="hmi-pipe"></div><div class="hmi-pipe"></div>
+                                <div class="hmi-pipe"></div><div class="hmi-pipe"></div><div class="hmi-pipe"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. ЭКРАН НАСТРОЕК -->
+                <div id="screen-settings" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Настройки линии</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-list-container">
+                            
+                            <div class="hmi-list-title">Настройки бака продукта</div>
+                            <div class="hmi-list-row"><input type="number" id="set_tank_on" class="hmi-val-box"><div class="hmi-text-box">Подача продукта On (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_tank_off" class="hmi-val-box"><div class="hmi-text-box">Подача продукта Off (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_tank_time" class="hmi-val-box"><div class="hmi-text-box">Время подачи продукта в бак (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_pressure" class="hmi-val-box hmi-highlight"><div class="hmi-text-box">Требуемое давление (Атм)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_sensitivity" class="hmi-val-box"><div class="hmi-text-box">Чувствительность контроля (Атм)</div></div>
+
+                            <div class="hmi-list-title" style="margin-top: 20px;">Настройки линии</div>
+                            <div class="hmi-list-row"><input type="number" id="set_stem_on_sec" class="hmi-val-box"><div class="hmi-text-box">Наливные штоки On (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_stem_on_speed" class="hmi-val-box"><div class="hmi-text-box">Наливные штоки On (Скорость %)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_stem_on_steps" class="hmi-val-box"><div class="hmi-text-box">Наливные штоки On (Шагов мм)</div></div>
+                            
+                            <div class="hmi-list-row"><input type="number" id="set_stem_cycle_sec" class="hmi-val-box hmi-highlight"><div class="hmi-text-box">Наливные штоки (Цикл налива Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_stem_cycle_speed" class="hmi-val-box"><div class="hmi-text-box">Наливные штоки (Цикл) (Скорость %)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_stem_cycle_steps" class="hmi-val-box"><div class="hmi-text-box">Наливные штоки (Цикл) (Шагов мм)</div></div>
+                            
+                            <div class="hmi-list-row"><input type="number" id="set_stem_off_sec" class="hmi-val-box"><div class="hmi-text-box">Наливные штоки Off (Исх Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_stem_off_speed" class="hmi-val-box"><div class="hmi-text-box">Наливные штоки Off (Исх) (Скорость %)</div></div>
+                            
+                            <div class="hmi-list-row"><input type="number" id="set_drop_on" class="hmi-val-box"><div class="hmi-text-box">Каплесборник On (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_drop_off" class="hmi-val-box"><div class="hmi-text-box">Каплесборник Off (Сек)</div></div>
+                            
+                            <div class="hmi-list-row"><input type="number" id="set_gate_on" class="hmi-val-box"><div class="hmi-text-box">Засекатель On (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_gate_off" class="hmi-val-box"><div class="hmi-text-box">Засекатель Off (Сек)</div></div>
+                            
+                            <div class="hmi-list-row"><input type="number" id="set_cutter_in_on" class="hmi-val-box"><div class="hmi-text-box">Отсекатель (Вход) On (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_cutter_in_off" class="hmi-val-box hmi-highlight"><div class="hmi-text-box">Отсекатель (Вход) Off (Сек)</div></div>
+                            
+                            <div class="hmi-list-row"><input type="number" id="set_cutter_out_on" class="hmi-val-box"><div class="hmi-text-box">Отсекатель (Выход) On (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_cutter_out_off" class="hmi-val-box"><div class="hmi-text-box">Отсекатель (Выход) Off (Сек)</div></div>
+                            
+                            <div class="hmi-list-row"><input type="number" id="set_conv_on" class="hmi-val-box"><div class="hmi-text-box">Конвейер On (Сек)</div></div>
+                            <div class="hmi-list-row"><input type="number" id="set_conv_off" class="hmi-val-box"><div class="hmi-text-box">Конвейер Off (Сек)</div></div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. ЭКРАН ЗАМЕРОВ УКУПОРА -->
+                <div id="screen-capper-inputs" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Замеры укупора</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-inputs-container">
+                            <h3 class="hmi-section-title">Линия и тара</h3>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Рабочая линия</label>
+                                <div id="capper_line_readout" class="hmi-line-readout">1 линия · 21w кольцо</div>
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="capper_cap_diameter">Диаметр крышки / колпачка, мм</label>
+                                <input type="number" id="capper_cap_diameter" class="hmi-input" value="28" min="10" max="100" step="1" list="capper_cap_diameter_list" oninput="updateCapperPreview()">
+                            </div>
+                            <datalist id="capper_cap_diameter_list">
+                                <option value="24"></option>
+                                <option value="28"></option>
+                                <option value="38"></option>
+                                <option value="45"></option>
+                                <option value="60"></option>
+                            </datalist>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="capper_cap_type">Тип крышки / усилие затяжки</label>
+                                <select id="capper_cap_type" class="hmi-input hmi-select hmi-capper-select" onchange="updateCapperPreview()">
+                                    <option value="standard">Стандартная винтовая</option>
+                                    <option value="ring">С контрольным кольцом (перфорация)</option>
+                                    <option value="flip">Флип-топ / Пуш-пул</option>
+                                    <option value="trigger">Триггер / Дозатор</option>
+                                </select>
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="capper_bottle_diameter">Диаметр / ширина флакона, мм</label>
+                                <input type="number" id="capper_bottle_diameter" class="hmi-input" value="85" min="20" max="200" step="1" oninput="updateCapperPreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="capper_bottle_height">Высота флакона, мм</label>
+                                <input type="number" id="capper_bottle_height" class="hmi-input" value="238" min="40" max="600" step="1" oninput="updateCapperPreview()">
+                            </div>
+                            <div class="hmi-field-note" id="capper_height_hint">Траверса: 238 мм — ориентир по центральному маховику.</div>
+
+                            <h3 class="hmi-section-title">Темп линии</h3>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="capper_rate">Скорость конвейера / темп линии, бут/час</label>
+                                <input type="number" id="capper_rate" class="hmi-input" value="2220" min="50" max="30000" step="10" oninput="updateCapperPreview()">
+                            </div>
+
+                            <div class="hmi-calc-box" style="margin-top: 20px;">
+                                <div class="hmi-calc-row">
+                                    <span>Прогноз цикла укупора</span>
+                                    <strong id="capper_preview_cycle">0.55 с</strong>
+                                </div>
+                                <div class="hmi-calc-row" style="margin-top: 8px;">
+                                    <span>Окно прохода тары</span>
+                                    <strong id="capper_preview_window" style="font-size: 20px;">0.70 с</strong>
+                                </div>
+                            </div>
+
+                            <button class="hmi-btn-generate" onclick="calculateCapperRecipe()" style="margin-top: 20px;">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                                Рассчитать укупора
+                            </button>
+
+                            <div class="hmi-recipe-panel">
+                                <div class="hmi-recipe-panel-head">
+                                    <span>💾 Сохранённые рецепты</span>
+                                    <span class="hmi-recipe-count" id="capper_recipes_count">0</span>
+                                </div>
+                                <div class="hmi-recipe-panel-note">Рецепт сохранит тайминги, датчики и давление Camozzi.</div>
+                                <div class="hmi-recipe-panel-actions">
+                                    <input type="text" id="recipe_name_capper" class="hmi-recipe-name" placeholder="Название продукта" maxlength="60">
+                                    <button type="button" class="hmi-recipe-btn" onclick="saveCurrentRecipe('capper')">Сохранить</button>
+                                    <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="openRecipesModal('capper')">База</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. ЭКРАН ТАЙМИНГОВ УКУПОРА -->
+                <div id="screen-capper-timings" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Укупор (Тайминги)</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-capper-workspace">
+                            <div class="hmi-list-container">
+                                <div class="hmi-list-title">Головы укупора</div>
+                                <div class="hmi-list-row"><input type="number" id="capper_head_rot_on" class="hmi-val-box hmi-highlight"><div class="hmi-text-box">Голова вращение On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_head_rot_off" class="hmi-val-box"><div class="hmi-text-box">Голова вращение Off (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_head_on" class="hmi-val-box"><div class="hmi-text-box">Голова On — сведение (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_head_off" class="hmi-val-box"><div class="hmi-text-box">Голова Off — сведение (Сек)</div></div>
+
+                                <div class="hmi-list-title" style="margin-top: 20px;">Отсекатели и фиксатор</div>
+                                <div class="hmi-list-row"><input type="number" id="capper_cutter_in_on" class="hmi-val-box"><div class="hmi-text-box">Отсекатель Вход On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_cutter_in_off" class="hmi-val-box hmi-highlight"><div class="hmi-text-box">Отсекатель Вход Off — окно прохода (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_cutter_on" class="hmi-val-box"><div class="hmi-text-box">Отсекатель (Укупора) On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_cutter_off" class="hmi-val-box"><div class="hmi-text-box">Отсекатель (Укупора) Off (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_lock_on" class="hmi-val-box"><div class="hmi-text-box">Фиксатор пробки On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_lock_off" class="hmi-val-box"><div class="hmi-text-box">Фиксатор пробки Off (Сек)</div></div>
+
+                                <button class="hmi-big-btn" onclick="openModule('capper')" style="margin-top: 20px;">
+                                    ← Изменить замеры укупора
+                                </button>
+                            </div>
+
+                            <aside class="hmi-capper-aside">
+                                <div class="hmi-telemetry-box">
+                                    <div class="hmi-telemetry-title">Телеметрия укупора</div>
+                                    <div class="hmi-telemetry-main">
+                                        <span>Цикл укупора</span>
+                                        <div><strong id="capper_cycle_result">0.55</strong><small> с</small></div>
+                                    </div>
+                                    <div class="hmi-telemetry-row"><span>Окно прохода тары</span><b id="capper_window_result">0.70 с</b></div>
+                                    <div class="hmi-telemetry-row"><span>Вращение голов</span><b id="capper_rotation_result">0.25 с</b></div>
+                                    <div class="hmi-telemetry-row"><span>Сведение голов</span><b id="capper_closure_result">0.20 с</b></div>
+                                    <div class="hmi-telemetry-row"><span>Профиль крышки</span><b id="capper_profile_result">Стандартная винтовая</b></div>
+                                    <div class="hmi-telemetry-row"><span>Крышка / тара</span><b id="capper_cap_result">28 мм</b></div>
+                                    <div class="hmi-telemetry-row"><span>Линия</span><b id="capper_line_result">1 линия · 21w кольцо</b></div>
+                                    <div class="hmi-telemetry-row"><span>Темп линии</span><b id="capper_rate_result">2220 бут/ч</b></div>
+                                    <div class="hmi-telemetry-row"><span>Такт линии</span><b id="capper_tact_result">1.62 с</b></div>
+                                </div>
+
+                                <div id="capper_warning" class="hmi-warning-box hidden"></div>
+
+                                <div class="hmi-notes-box">
+                                    <div class="hmi-notes-title">Наладчику · контроль</div>
+                                    <div class="hmi-note-item">Давление пневмозажимов Camozzi: <b>4–6 бар</b>, проверить по манометру.</div>
+                                    <div class="hmi-note-item">Зазор роликов под крышку <b>Ø <span id="capper_reminder_roller_value">28</span> мм</b> — без люфта и перекоса.</div>
+                                    <div class="hmi-note-item">Не допускать замятия полиуретановых роликов; износ кромки &gt; 0.5 мм — замена.</div>
+                                    <div class="hmi-note-item">Траверса по центральному маховику: <b><span id="capper_reminder_height_value">238</span> мм</b>.</div>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. ЭКРАН ДАТЧИКОВ И ПНЕВМАТИКИ УКУПОРА -->
+                <div id="screen-capper-sensors" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Датчики и Пневматика</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-capper-workspace">
+                            <div class="hmi-list-container">
+                                <div class="hmi-list-title">Фильтры датчиков</div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_zone_on" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика зона Укупора On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_zone_off" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика зона Укупора Off (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_jam_out_on" class="hmi-val-box hmi-highlight"><div class="hmi-text-box">Фильтр датчика затора (Выход) On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_jam_out_off" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика затора (Выход) Off (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_jam_in_on" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика затора (Вход) On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_jam_in_off" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика затора (Вход) Off (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_hit_on" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика удара/переноса On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_hit_off" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика удара/переноса Off (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_cutter_on" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика отсекателя (Пер) On (Сек)</div></div>
+                                <div class="hmi-list-row"><input type="number" id="capper_sensor_cutter_off" class="hmi-val-box"><div class="hmi-text-box">Фильтр датчика отсекателя (Пер) Off (Сек)</div></div>
+
+                                <div class="hmi-list-title" style="margin-top: 20px;">Пневматика Camozzi</div>
+                                <div class="hmi-list-row"><input type="number" id="capper_pneu_pressure" class="hmi-val-box hmi-highlight" value="5.0" min="2" max="8" step="0.1" oninput="updateCapperPressureStatus()"><div class="hmi-text-box">Давление пневмозажимов Camozzi (Бар)</div></div>
+                            </div>
+
+                            <aside class="hmi-capper-aside">
+                                <div class="hmi-telemetry-box">
+                                    <div class="hmi-telemetry-title">Настройка пневматики</div>
+                                    <div class="hmi-telemetry-main">
+                                        <span>Camozzi</span>
+                                        <div><strong id="capper_pressure_value">5.0</strong><small> бар</small></div>
+                                    </div>
+                                    <div class="hmi-telemetry-row"><span>Рабочий диапазон</span><b>4–6 бар</b></div>
+                                    <div class="hmi-telemetry-row"><span>Статус давления</span><b id="capper_pressure_status" class="is-ok">4–6 бар · НОРМА</b></div>
+                                    <div class="hmi-telemetry-row"><span>Тара</span><b id="capper_bottle_result_sensor">Ø85 × 238 мм</b></div>
+                                    <div class="hmi-clamp-hint" id="capper_clamp_hint">Прижимы подстроить под Ø85 мм; траверса 238 мм.</div>
+                                </div>
+
+                                <div class="hmi-notes-box">
+                                    <div class="hmi-notes-title">Проверка после настройки</div>
+                                    <div class="hmi-note-item">Прижимы не должны смещать флакон при ударе роликов.</div>
+                                    <div class="hmi-note-item">Зазор роликов выставить по диаметру крышки.</div>
+                                    <div class="hmi-note-item">После изменения давления — 3–5 холостых циклов.</div>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. ПАМЯТКА НАЛИВА -->
+                <div id="screen-fill-checklist" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Памятка наладчика</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-checklist-container">
+                            <div class="hmi-checklist-header">
+                                <div>
+                                    <div class="hmi-checklist-title">📋 Памятка наладчика / Оператора</div>
+                                    <div class="hmi-checklist-subtitle">Блок налива · 21w кольцо · 12 форсунок</div>
+                                </div>
+                                <div class="hmi-checklist-progress" id="fill_checklist_progress">0 / 6</div>
+                            </div>
+                            <div class="hmi-checklist-bar"><div class="hmi-checklist-bar-fill" id="fill_checklist_bar"></div></div>
+
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="fill" onchange="updateChecklistProgress('fill')"><span class="hmi-check-num">01</span><span class="hmi-check-body"><b>Проверить давление воздуха и герметичность магистралей</b><small>До пуска: ревизия соединений, отсутствие утечек, манометр в рабочей зоне.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="fill" onchange="updateChecklistProgress('fill')"><span class="hmi-check-num">02</span><span class="hmi-check-body"><b>Осмотреть зону налива и дренаж</b><small>Нет подтёков продукта, узлы чистые, каплесборник и поддон свободны.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="fill" onchange="updateChecklistProgress('fill')"><span class="hmi-check-num">03</span><span class="hmi-check-body"><b>Сверить жиклёр с вязкостью и объёмом дозы</b><small>6 мм — низкая вязкость, 8 мм — средняя, 14 мм — густые продукты; сверить с расчётом.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="fill" onchange="updateChecklistProgress('fill')"><span class="hmi-check-num">04</span><span class="hmi-check-body"><b>Контроль пенообразования на мениске</b><small>Пробный флакон: пена у горловины не должна подниматься выше контрольной риски.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="fill" onchange="updateChecklistProgress('fill')"><span class="hmi-check-num">05</span><span class="hmi-check-body"><b>Проверить Kp/Ki и дозы по форсункам</b><small>Сравнить с рассчитанными значениями; при отклонении &gt; 2% выполнить калибровку.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="fill" onchange="updateChecklistProgress('fill')"><span class="hmi-check-num">06</span><span class="hmi-check-body"><b>Не оставлять линию без присмотра</b><small>При заполненном баке и открытых штоках оператор остаётся у поста.</small></span></label>
+
+                            <button class="hmi-big-btn" onclick="resetChecklist('fill')" style="margin-top: 16px;">Сбросить чек-лист налива</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. ПАМЯТКА УКУПОРА -->
+                <div id="screen-capper-checklist" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Памятка наладчика</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-checklist-container">
+                            <div class="hmi-checklist-header">
+                                <div>
+                                    <div class="hmi-checklist-title">📋 Памятка наладчика / Оператора</div>
+                                    <div class="hmi-checklist-subtitle">Блок укупора · ПАККА · Camozzi · Delta</div>
+                                </div>
+                                <div class="hmi-checklist-progress" id="capper_checklist_progress">0 / 6</div>
+                            </div>
+                            <div class="hmi-checklist-bar"><div class="hmi-checklist-bar-fill" id="capper_checklist_bar"></div></div>
+
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="capper" onchange="updateChecklistProgress('capper')"><span class="hmi-check-num">01</span><span class="hmi-check-body"><b>Проверить давление пневмозажимов Camozzi</b><small>Рабочий диапазон 4–6 бар; проверить по манометру и стабильность при цикле.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="capper" onchange="updateChecklistProgress('capper')"><span class="hmi-check-num">02</span><span class="hmi-check-body"><b>Выставить траверсу под высоту флакона</b><small>Центральным маховиком; после выставления затянуть 4 стопорных болта.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="capper" onchange="updateChecklistProgress('capper')"><span class="hmi-check-num">03</span><span class="hmi-check-body"><b>Осмотреть полиуретановые ролики</b><small>Нет замятия, сколов и налипания; износ кромки &gt; 0.5 мм — замена.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="capper" onchange="updateChecklistProgress('capper')"><span class="hmi-check-num">04</span><span class="hmi-check-body"><b>Проверить бункер-ориентатор пробок</b><small>Достаточный уровень пробок, нет перекосов и двойной подачи.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="capper" onchange="updateChecklistProgress('capper')"><span class="hmi-check-num">05</span><span class="hmi-check-body"><b>Согласовать зазор роликов с диаметром крышки</b><small>24 / 28 / 38 / 45 / 60 мм — без люфта и перекоса.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="capper" onchange="updateChecklistProgress('capper')"><span class="hmi-check-num">06</span><span class="hmi-check-body"><b>Пробный цикл 3–5 бутылок</b><small>Контроль момента затяжки, отсутствие срыва резьбы и повреждения кольца.</small></span></label>
+
+                            <button class="hmi-big-btn" onclick="resetChecklist('capper')" style="margin-top: 16px;">Сбросить чек-лист укупора</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. ЭКРАН ЗАМЕРОВ И ПРИБОРОВ ЭТИКЕТИРОВЩИКА -->
+                <div id="screen-labeler-inputs" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Замеры и Приборы</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-inputs-container">
+                            <h3 class="hmi-section-title">Линия и режим</h3>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label">Рабочая линия</label>
+                                <div id="labeler_line_readout" class="hmi-line-readout">1 линия · 21w кольцо</div>
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_mode">Режим работы этикетировщика</label>
+                                <select id="labeler_mode" class="hmi-input hmi-select hmi-capper-select" onchange="updateLabelerPreview()">
+                                    <option value="wrap">Круговая обкатка (1 аппликатор + ремень)</option>
+                                    <option value="both">Двухсторонняя оклейка (2 аппликатора + лопатки)</option>
+                                </select>
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_wrap_scheme">Схема круговой обкатки</label>
+                                <select id="labeler_wrap_scheme" class="hmi-input hmi-select hmi-capper-select" onchange="updateLabelerPreview()">
+                                    <option value="rollers">Трёхроликовая (1 ведущий + 2 прижимных)</option>
+                                    <option value="belt">Обкаточный ремень</option>
+                                </select>
+                            </div>
+                            <div class="hmi-field-note">Схема роликов применяется только для круглой тары в режиме обкатки.</div>
+
+                            <h3 class="hmi-section-title">Замеры и приборы</h3>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_tach">Показание контактного тахометра на конвейере, м/мин</label>
+                                <input type="number" id="labeler_tach" class="hmi-input" value="27.5" min="1" max="100" step="0.1" oninput="updateLabelerPreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_diam_bottom">Диаметр / ширина флакона внизу, мм</label>
+                                <input type="number" id="labeler_diam_bottom" class="hmi-input" value="85" min="20" max="200" step="1" oninput="updateLabelerPreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_diam_top">Диаметр / ширина флакона вверху в зоне этикетки, мм</label>
+                                <input type="number" id="labeler_diam_top" class="hmi-input" value="85" min="20" max="200" step="1" oninput="updateLabelerPreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_label_height">Высота этикетки, мм</label>
+                                <input type="number" id="labeler_label_height" class="hmi-input" value="140" min="20" max="400" step="1" oninput="updateLabelerPreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_label_length">Длина (ширина развёртки) этикетки, мм</label>
+                                <input type="number" id="labeler_label_length" class="hmi-input" value="220" min="20" max="500" step="1" oninput="updateLabelerPreview()">
+                            </div>
+                            <div class="hmi-form-row">
+                                <label class="hmi-label" for="labeler_material">Материал этикетки</label>
+                                <select id="labeler_material" class="hmi-input hmi-select hmi-capper-select" onchange="updateLabelerPreview()">
+                                    <option value="pp">Полипропилен (плёнка ПП)</option>
+                                    <option value="paper">Бумага</option>
+                                </select>
+                            </div>
+                            <label class="hmi-inline-check">
+                                <input type="checkbox" id="labeler_two_rolls" onchange="updateLabelerPreview()">
+                                Работа с двух рулонов (только круговая обкатка, Start 2 = 140 мс)
+                            </label>
+
+                            <div class="hmi-calc-box" style="margin-top: 20px;">
+                                <div class="hmi-calc-row"><span>Уставка «Скорость» Kinco</span><strong id="labeler_preview_speed">455</strong></div>
+                                <div class="hmi-calc-row" style="margin-top: 8px;"><span>Завал аппликатора</span><strong id="labeler_preview_inclinometer" style="font-size: 20px;">0.0°</strong></div>
+                                <div class="hmi-calc-row" style="margin-top: 8px;"><span>Угол атаки ножа</span><strong id="labeler_preview_angle" style="font-size: 20px;">12.0°</strong></div>
+                                <div class="hmi-calc-row" id="labeler_preview_gap_row" style="margin-top: 8px;"><span>Зазор каретки роликов</span><strong id="labeler_preview_gap" style="font-size: 20px;">82–83 мм</strong></div>
+                            </div>
+
+                            <button class="hmi-btn-generate" onclick="calculateLabelerRecipe()" style="margin-top: 20px;">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                                Рассчитать этикетировщик
+                            </button>
+
+                            <div class="hmi-recipe-panel">
+                                <div class="hmi-recipe-panel-head">
+                                    <span>💾 Сохранённые рецепты</span>
+                                    <span class="hmi-recipe-count" id="labeler_recipes_count">0</span>
+                                </div>
+                                <div class="hmi-recipe-panel-note">Рецепт сохранит приборы, углы, тайминги Kinco и схему обкатки.</div>
+                                <div class="hmi-recipe-panel-actions">
+                                    <input type="text" id="recipe_name_labeler" class="hmi-recipe-name" placeholder="Название продукта" maxlength="60">
+                                    <button type="button" class="hmi-recipe-btn" onclick="saveCurrentRecipe('labeler')">Сохранить</button>
+                                    <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="openRecipesModal('labeler')">База</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 11. ПАНЕЛЬ KINCO -->
+                <div id="screen-labeler-panel" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Панель Kinco</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-labeler-workspace">
+                            <div class="hmi-labeler-main">
+                                <div class="hmi-instrument-grid">
+                                    <div class="hmi-instrument-card">
+                                        <span>Контактный тахометр</span>
+                                        <div><strong id="labeler_tach_result">27.5</strong><small>м/мин</small></div>
+                                    </div>
+                                    <div class="hmi-instrument-card" id="labeler_wrap_speed_card">
+                                        <span id="labeler_wrap_speed_caption">Ведущий ролик</span>
+                                        <div><strong id="labeler_belt_result">28.6–29.2</strong><small>м/мин</small></div>
+                                        <em id="labeler_wrap_speed_note">+4–6% к конвейеру</em>
+                                    </div>
+                                    <div class="hmi-instrument-card" id="labeler_carriage_gap_card">
+                                        <span>Зазор каретки</span>
+                                        <div><strong id="labeler_carriage_gap_result">82–83</strong><small>мм</small></div>
+                                        <em>D − 3…2 мм преднатяга</em>
+                                    </div>
+                                    <div class="hmi-instrument-card">
+                                        <span>Инклинометр</span>
+                                        <div><strong id="labeler_inclinometer_result">0.0</strong><small>°</small></div>
+                                    </div>
+                                    <div class="hmi-instrument-card">
+                                        <span>Угломер ножа</span>
+                                        <div><strong id="labeler_angle_result">12.0</strong><small>°</small></div>
+                                    </div>
+                                </div>
+
+                                <div class="kinco-panel">
+                                    <div class="kinco-panel-header">
+                                        <div><span class="kinco-brand">KINCO</span><span class="kinco-series">GREEN SERIES</span></div>
+                                        <div class="kinco-status">СИКОМ · ONLINE</div>
+                                    </div>
+                                    <div class="kinco-screen">
+                                        <div class="kinco-row kinco-main"><span>Скорость</span><div><input type="text" id="labeler_k_speed" class="kinco-field" readonly value="455"><small>у.е.</small></div></div>
+                                        <div class="kinco-row"><span>Задержка старта</span><div><input type="text" id="labeler_k_start" class="kinco-field" readonly value="100"><small>мс</small></div></div>
+                                        <div class="kinco-row"><span>Задержка остановки</span><div><input type="text" id="labeler_k_stop" class="kinco-field" readonly value="92"><small>мс</small></div></div>
+                                        <div class="kinco-row"><span>Задержка вкл отсекателя</span><div><input type="text" id="labeler_k_cutter" class="kinco-field" readonly value="140"><small>×10 мс</small></div></div>
+                                        <div class="kinco-row"><span>Задержка вкл захвата</span><div><input type="text" id="labeler_k_grip" class="kinco-field" readonly value="44"><small>×10 мс</small></div></div>
+                                        <div class="kinco-row"><span>Задержка старта 2</span><div><input type="text" id="labeler_k_start2" class="kinco-field" readonly value="0"><small>мс</small></div></div>
+                                    </div>
+                                    <div class="kinco-panel-footer">Параметры записываются в контроллер Kinco Green Series. Изменять только по протоколу наладки.</div>
+                                </div>
+
+                                <button class="hmi-big-btn" onclick="openModule('labeler')" style="margin-top: 16px;">← Изменить замеры и приборы</button>
+                            </div>
+
+                            <aside class="hmi-capper-aside">
+                                <div class="hmi-telemetry-box">
+                                    <div class="hmi-telemetry-title">Инструментальная сводка</div>
+                                    <div class="hmi-telemetry-row"><span>Скорость ленты</span><b id="labeler_tape_target">27.5 м/мин</b></div>
+                                    <div class="hmi-telemetry-row"><span id="labeler_wrap_speed_aside_caption">Ведущий ролик +4–6%</span><b id="labeler_belt_result_aside">28.6–29.2 м/мин</b></div>
+                                    <div class="hmi-telemetry-row"><span>Схема обкатки</span><b id="labeler_wrap_scheme_result">3 ролика (1+2)</b></div>
+                                    <div class="hmi-telemetry-row"><span>Зазор каретки</span><b id="labeler_carriage_gap_aside">82–83 мм</b></div>
+                                    <div class="hmi-telemetry-row"><span>Параллельность роликов</span><b id="labeler_parallel_result">≤ 0.1 мм</b></div>
+                                    <div class="hmi-telemetry-row"><span>Завал аппликатора</span><b id="labeler_inclinometer_aside">0.0°</b></div>
+                                    <div class="hmi-telemetry-row"><span>Угол атаки ножа</span><b id="labeler_angle_aside">12.0°</b></div>
+                                    <div class="hmi-telemetry-row"><span>Режим</span><b id="labeler_mode_result">Круговая обкатка</b></div>
+                                    <div class="hmi-telemetry-row"><span>Материал</span><b id="labeler_material_result">Полипропилен (ПП)</b></div>
+                                    <div class="hmi-telemetry-row"><span>Линия</span><b id="labeler_line_result">1 линия · 21w кольцо</b></div>
+                                    <div class="hmi-telemetry-row"><span>Старт 2</span><b id="labeler_start2_result">0 мс</b></div>
+                                </div>
+
+                                <div class="hmi-notes-box">
+                                    <div class="hmi-notes-title">Перед пуском</div>
+                                    <div class="hmi-note-item">Скорость конвейера — только по контактному тахометру.</div>
+                                    <div class="hmi-note-item">Ноль и завал аппликатора — электронным инклинометром.</div>
+                                    <div class="hmi-note-item">Угол атаки ножа — электронным угломером, затем очистка ножа и валиков.</div>
+                                    <div class="hmi-note-item">Три ролика: ведущий + 2 прижимных; проверить параллельность и преднатяг резины 2–3 мм.</div>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12. ПАМЯТКА ЭТИКЕТИРОВЩИКА -->
+                <div id="screen-labeler-notes" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Памятка наладчика</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-checklist-container">
+                            <div class="hmi-checklist-header">
+                                <div>
+                                    <div class="hmi-checklist-title">📋 Памятка наладчика / Оператора</div>
+                                    <div class="hmi-checklist-subtitle">Этикетировщик СИКОМ · Green Series · Kinco</div>
+                                </div>
+                                <div class="hmi-checklist-progress" id="labeler_checklist_progress">0 / 8</div>
+                            </div>
+                            <div class="hmi-checklist-bar"><div class="hmi-checklist-bar-fill" id="labeler_checklist_bar"></div></div>
+
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">01</span><span class="hmi-check-body"><b>Замерить скорость конвейера контактным тахометром</b><small>Перед каждой сменой; значение занести в панель Kinco и пересчитать уставки.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">02</span><span class="hmi-check-body"><b>Выставить ноль и угол завала электронным инклинометром</b><small>Совместить аппликатор с образующей флакона и зафиксировать положение.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">03</span><span class="hmi-check-body"><b>Проверить угол атаки ножа электронным угломером</b><small>12.0° / 14.5° — обкатка; 18.5° / 20.5° — двухсторонняя оклейка.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">04</span><span class="hmi-check-body"><b>Очистить отделительный нож и прижимные валики/лопатки</b><small>Удалить клей по регламенту, без абразива; проверить кромку ножа.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">05</span><span class="hmi-check-body"><b>Контроль натяжения подложки</b><small>Без складок и провисания; датчик метки чистый, двойной подачи нет.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">06</span><span class="hmi-check-body"><b>Пробная оклейка и проверка позиции метки</b><small>Этикетка без морщин и пузырей, стабильная позиция на флаконе.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">07</span><span class="hmi-check-body"><b>Проверить схему обкатки и параллельность трёх роликов</b><small>1 ведущий от мотор-редуктора + 2 прижимных на каретке; просвет между роликами и флаконом равномерный, перекос не более 0.1 мм.</small></span></label>
+                            <label class="hmi-check-item"><input type="checkbox" class="hmi-check-box" data-checklist="labeler" onchange="updateChecklistProgress('labeler')"><span class="hmi-check-num">08</span><span class="hmi-check-body"><b>Выставить зазор прижимной каретки D−3…D−2 мм</b><small>Преднатяг резины 2–3 мм; после выставления затянуть фиксаторы каретки.</small></span></label>
+
+                            <button class="hmi-big-btn" onclick="resetChecklist('labeler')" style="margin-top: 16px;">Сбросить чек-лист этикетировщика</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 13. СИМУЛЯТОР НАЛАДЧИКА -->
+                <div id="screen-simulator" class="hmi-screen hidden">
+                    <div class="hmi-screen-title">Тренажёр наладчика</div>
+                    <div class="hmi-settings-scroll">
+                        <div class="hmi-sim-container">
+                            <div id="sim-modes">
+                                <div class="hmi-sim-intro">
+                                    <div class="hmi-hub-kicker">GLOBAL CHEMICAL · TRAINING MODULE</div>
+                                    <h1 class="hmi-sim-title">🎮 СИМУЛЯТОР НАЛАДКИ</h1>
+                                    <p class="hmi-sim-subtitle">Реальные физические модели налива 21w, укупора ПАККА и этикетировщика СИКОМ. Случайные производственные задания, таймер и разбор ошибок.</p>
+                                </div>
+
+                                <div class="hmi-sim-mode-grid">
+                                    <button type="button" class="hmi-sim-mode" onclick="startSimMode('beginner')">
+                                        <span class="hmi-sim-mode-icon">01 · ОПЕРАТОР</span>
+                                        <b>Новичок / Оператор</b>
+                                        <small>Вводная по таре и продукту, 4–5 ключевых уставок. Без жёсткого таймера, с подсказками по физике.</small>
+                                    </button>
+                                    <button type="button" class="hmi-sim-mode" onclick="startSimMode('master')">
+                                        <span class="hmi-sim-mode-icon">02 · МАСТЕР</span>
+                                        <b>Мастер-наладчик</b>
+                                        <small>Полная переналадка узла, 6 параметров и жёсткий таймер 3:00. Ошибки учитываются с особым разбором.</small>
+                                    </button>
+                                    <button type="button" class="hmi-sim-mode" onclick="startSimMode('accident')">
+                                        <span class="hmi-sim-mode-icon">03 · АВАРИЯ</span>
+                                        <b>Авария / Поиск косяка</b>
+                                        <small>Сбитый рецепт с опасной ошибкой. Найдите и исправьте критические параметры за 2:00.</small>
+                                    </button>
+                                </div>
+
+                                <button class="hmi-big-btn" onclick="showHub()">← Назад к узлам линии</button>
+                            </div>
+
+                            <div id="sim-round" class="hidden">
+                                <div class="hmi-sim-topbar">
+                                    <div class="hmi-sim-topbar-left">
+                                        <span class="hmi-sim-mode-label" id="sim-mode-label">Тренировка</span>
+                                        <span class="hmi-sim-timer hidden" id="sim-timer-wrap">⏱ <b id="sim-timer">03:00</b></span>
+                                    </div>
+                                    <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="simShowModes()">Сменить режим</button>
+                                </div>
+                                <div class="hmi-sim-brief">
+                                    <div class="hmi-sim-task-title" id="sim-task-title">Производственное задание</div>
+                                    <div class="hmi-sim-task-brief" id="sim-task-brief"></div>
+                                    <div id="sim-accident-note" class="hmi-warning-box hidden"></div>
+                                </div>
+                                <div id="sim-task-fields" class="hmi-sim-fields"></div>
+                                <div class="hmi-sim-actions">
+                                    <button type="button" class="hmi-btn-generate" onclick="checkSimAnswer()">Проверить ответ</button>
+                                    <button type="button" class="hmi-big-btn" onclick="startSimMode(currentSimMode)">Новое задание</button>
+                                </div>
+                            </div>
+
+                            <div id="sim-result" class="hidden">
+                                <div class="hmi-sim-result-head">
+                                    <div class="hmi-sim-score-wrap">
+                                        <div class="hmi-sim-score" id="sim-score">0</div>
+                                        <div class="hmi-sim-score-label">из 100</div>
+                                    </div>
+                                    <div>
+                                        <div class="hmi-sim-result-title" id="sim-rank">Стажёр</div>
+                                        <div class="hmi-sim-result-sub" id="sim-result-sub"></div>
+                                    </div>
+                                </div>
+                                <div id="sim-breakdown" class="hmi-sim-breakdown"></div>
+                                <div class="hmi-sim-actions">
+                                    <button type="button" class="hmi-btn-generate" onclick="startSimMode(currentSimMode)">Ещё раунд</button>
+                                    <button type="button" class="hmi-big-btn" onclick="simShowModes()">К режимам</button>
+                                    <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="showHub()">На хаб</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div id="hmi-modal-nozzle" class="hmi-modal-overlay hidden">
+        <div class="hmi-modal">
+            <div class="hmi-modal-header">
+                <h3 id="modal-nozzle-title">Форсунка №1</h3>
+                <button class="hmi-modal-close" onclick="closeNozzleSettings()">✕</button>
+            </div>
+            <div class="hmi-modal-body">
+                <div class="hmi-modal-row">
+                    <label>Доза/мл</label>
+                    <input type="number" id="modal-input-dose" class="hmi-modal-input" value="851" step="1">
+                </div>
+                <div class="hmi-modal-row">
+                    <label>Пропорциональный коэффициент (Kp)</label>
+                    <input type="number" id="modal-input-kp" class="hmi-modal-input" value="1.65" step="0.01">
+                </div>
+                <div class="hmi-modal-row">
+                    <label>Интегральный коэффициент (Ki)</label>
+                    <input type="number" id="modal-input-ki" class="hmi-modal-input" value="0.10" step="0.01">
+                </div>
+            </div>
+            <div class="hmi-modal-footer">
+                <button class="hmi-btn-save" onclick="saveNozzleSettings()">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Применить
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="recipes-import-file" class="hmi-file-input" accept=".json,application/json" onchange="importRecipes(event)">
+    <div id="hmi-toast" class="hmi-toast hidden"></div>
+
+    <div id="recipes-modal" class="hmi-modal-overlay hidden">
+        <div class="hmi-modal hmi-recipes-modal">
+            <div class="hmi-modal-header">
+                <h3>💾 Сохранённые рецепты</h3>
+                <button class="hmi-modal-close" onclick="closeRecipesModal()">✕</button>
+            </div>
+            <div class="hmi-modal-body">
+                <div class="hmi-recipes-toolbar">
+                    <div class="hmi-recipes-filters">
+                        <button type="button" class="hmi-recipes-filter active" data-filter="all" onclick="setRecipesFilter('all')">Все</button>
+                        <button type="button" class="hmi-recipes-filter" data-filter="fill" onclick="setRecipesFilter('fill')">Налив</button>
+                        <button type="button" class="hmi-recipes-filter" data-filter="capper" onclick="setRecipesFilter('capper')">Укупор</button>
+                        <button type="button" class="hmi-recipes-filter" data-filter="labeler" onclick="setRecipesFilter('labeler')">Этикетировщик</button>
+                    </div>
+                    <div class="hmi-recipes-io">
+                        <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="exportRecipes()">Экспорт JSON</button>
+                        <button type="button" class="hmi-recipe-btn hmi-recipe-btn-ghost" onclick="triggerRecipeImport()">Импорт JSON</button>
+                    </div>
+                </div>
+                <div id="recipes-list" class="hmi-recipes-list"></div>
+            </div>
+            <div class="hmi-modal-footer">
+                <button class="hmi-btn-save" onclick="closeRecipesModal()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

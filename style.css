@@ -1,0 +1,617 @@
+/* ============================================================
+   HMI ДИЗАЙН-СИСТЕМА (Черный, Желтый, Белый)
+   ============================================================ */
+:root {
+    --hmi-bg: #000000;
+    --hmi-panel: #111111;
+    --hmi-surface: #1a1a1a;
+    --hmi-border: #333333;
+    --hmi-text: #ffffff;
+    --hmi-text-dim: #999999;
+    --hmi-accent: #ffcc00;
+    --hmi-accent-hover: #ffdb4d;
+    --hmi-danger: #ff2a2a;
+    --hmi-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --hmi-mono: 'Consolas', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+html, body { height: 100%; }
+body { background-color: var(--hmi-bg); color: var(--hmi-text); font-family: var(--hmi-font); height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; }
+.hidden { display: none !important; }
+
+/* ============================================================
+   СОВРЕМЕННАЯ ЗАСТАВКА (SPLASH SCREEN)
+   ============================================================ */
+.splash-screen {
+    position: fixed; inset: 0; z-index: 99999;
+    background: #050505;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: opacity 0.6s ease, visibility 0.6s;
+    overflow: hidden;
+}
+.splash-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.splash-glow-bg { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+.glow-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4; animation: floatOrb 10s infinite alternate; }
+.orb-yellow { width: 50vw; height: 50vw; background: #ffcc00; top: -20%; right: -10%; }
+.orb-dark { width: 60vw; height: 60vw; background: #222; bottom: -30%; left: -20%; animation-delay: -5s; }
+@keyframes floatOrb { from { transform: translate(0, 0); } to { transform: translate(-50px, 50px); } }
+
+.splash-content {
+    position: relative; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; width: 100%;
+}
+
+.splash-logo-box {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px 60px;
+    display: flex; flex-direction: column; align-items: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    animation: splashBoxAppear 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transform: translateY(20px); opacity: 0;
+}
+@keyframes splashBoxAppear { to { transform: translateY(0); opacity: 1; } }
+
+.splash-title-top {
+    font-size: 3rem; font-weight: 900; color: #ffffff;
+    letter-spacing: 25px; margin-right: -25px;
+    font-family: 'Arial Black', Impact, sans-serif;
+    margin-bottom: -15px; text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.splash-logo-gc { display: flex; font-size: 9rem; font-family: 'Arial Black', Impact, sans-serif; font-weight: 900; line-height: 1; }
+.logo-g { color: #ffffff; z-index: 2; transform: scaleY(1.1); }
+.logo-c { color: #ffcc00; z-index: 1; margin-left: -25px; transform: scaleY(1.1); text-shadow: 0 0 40px rgba(255, 204, 0, 0.8), 0 0 80px rgba(255, 204, 0, 0.4); animation: pulseC 2s ease-in-out infinite alternate; }
+@keyframes pulseC { from { text-shadow: 0 0 30px rgba(255, 204, 0, 0.6); } to { text-shadow: 0 0 60px rgba(255, 204, 0, 1), 0 0 100px rgba(255, 204, 0, 0.6); } }
+
+.splash-subtitle { font-size: 0.9rem; color: rgba(255, 255, 255, 0.5); letter-spacing: 12px; margin-top: 15px; margin-right: -12px; font-family: var(--hmi-mono); text-transform: uppercase; }
+
+.splash-loader-wrap { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; }
+.splash-loader-bar { width: 200px; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; position: relative; }
+.splash-loader-bar::after { content: ""; position: absolute; left: 0; top: 0; height: 100%; background: #ffcc00; box-shadow: 0 0 10px #ffcc00; animation: loadProgress 2.5s cubic-bezier(0.1, 0.8, 0.2, 1) forwards; }
+@keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
+
+.splash-hint { font-family: var(--hmi-mono); font-size: 12px; color: var(--hmi-text-dim); letter-spacing: 2px; animation: blinkHint 2s infinite alternate; }
+@keyframes blinkHint { from { opacity: 0.3; } to { opacity: 1; } }
+
+.splash-particles { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.splash-particle { position: absolute; background: #ffcc00; border-radius: 50%; box-shadow: 0 0 10px #ffcc00; opacity: 0; animation: floatParticle linear infinite; }
+@keyframes floatParticle { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 20% { opacity: 0.6; } 80% { opacity: 0.6; } 100% { transform: translateY(-100px) scale(1); opacity: 0; } }
+
+/* ============================================================
+   КАРКАС
+   ============================================================ */
+.hmi-container { display: flex; height: 100vh; height: 100dvh; width: 100vw; }
+.hmi-sidebar {
+    width: 75px; background-color: var(--hmi-panel); border-right: 2px solid var(--hmi-border);
+    display: flex; flex-direction: column; align-items: center; padding-top: 15px; gap: 15px; z-index: 20;
+}
+.hmi-nav-group { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; }
+.hmi-container.hub-mode .hmi-sidebar { display: none; }
+.hmi-nav-btn {
+    width: 55px; height: 55px; background: transparent; border: 2px solid transparent; border-radius: 8px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.hmi-nav-btn svg { width: 30px; height: 30px; fill: var(--hmi-text-dim); transition: fill 0.2s; }
+.hmi-nav-btn:hover svg { fill: var(--hmi-text); }
+.hmi-nav-btn.active { border-color: var(--hmi-accent); background: rgba(255, 204, 0, 0.1); }
+.hmi-nav-btn.active svg { fill: var(--hmi-accent); }
+.hmi-nav-btn-labeled { height: 62px; flex-direction: column; gap: 3px; padding: 6px 2px; }
+.hmi-nav-btn-labeled svg { width: 24px; height: 24px; }
+.hmi-nav-label { font-size: 8px; line-height: 1.15; font-weight: 700; letter-spacing: 0.4px; color: var(--hmi-text-dim); text-align: center; text-transform: uppercase; }
+.hmi-nav-btn.active .hmi-nav-label { color: var(--hmi-accent); }
+.hmi-main-content { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); overflow: hidden; }
+
+/* ============================================================
+   НЕОНОВЫЙ ФОН С ГЕОМЕТРИЧЕСКИМИ ФИГУРАМИ (HMI PATTERN)
+   ============================================================ */
+.hmi-bg-decor {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.neon-shape {
+    position: absolute;
+    fill: none;
+    stroke: var(--hmi-accent);
+    stroke-width: 2;
+    stroke-dasharray: 40 160; /* Длина змейки и пустого места */
+    filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 204, 0, 0.5));
+    animation: neonSnake 4s linear infinite, floatShape 10s ease-in-out infinite alternate;
+    opacity: 0.6;
+}
+
+/* Шестиугольники */
+.hex-1 { width: 250px; height: 250px; top: 10%; left: 15%; animation-duration: 3s, 8s; }
+.hex-2 { width: 400px; height: 400px; bottom: -10%; right: -5%; animation-duration: 5s, 12s; opacity: 0.4; }
+.hex-3 { width: 150px; height: 150px; top: 50%; right: 25%; animation-duration: 2.5s, 6s; }
+
+/* Треугольники */
+.tri-1 { width: 100px; height: 100px; top: 20%; right: 35%; animation-duration: 2s, 7s; }
+.tri-2 { width: 180px; height: 180px; bottom: 25%; left: 20%; animation-duration: 4s, 10s; opacity: 0.5; }
+.tri-3 { width: 80px; height: 80px; top: 70%; left: 10%; animation-duration: 3s, 9s; }
+.tri-4 { width: 120px; height: 120px; top: 15%; left: 45%; animation-duration: 3.5s, 11s; }
+
+/* Анимация змейки (светящейся обводки) */
+@keyframes neonSnake {
+    from { stroke-dashoffset: 200; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* Плавное парение */
+@keyframes floatShape {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* ============================================================
+   ВЕРХНЯЯ ПАНЕЛЬ
+   ============================================================ */
+.hmi-header { display: flex; align-items: center; padding: 15px; gap: 20px; border-bottom: 1px solid var(--hmi-border); background: rgba(0,0,0,0.5); z-index: 5; position: relative; }
+.hmi-header-brand { display: flex; align-items: center; gap: 14px; margin-right: auto; min-width: 0; }
+.hmi-header-logo { font-family: 'Arial Black', Impact, sans-serif; font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: 2px; margin-right: auto; text-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
+.hmi-header-brand .hmi-header-logo { margin-right: 0; white-space: nowrap; }
+.hmi-header-logo .logo-yellow { color: var(--hmi-accent); text-shadow: 0 0 15px rgba(255, 204, 0, 0.5); }
+.hmi-hub-back-btn {
+    height: 36px; padding: 0 12px; background: rgba(255, 204, 0, 0.06);
+    border: 1px solid rgba(255, 204, 0, 0.45); border-radius: 4px;
+    color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 11px;
+    font-weight: 700; letter-spacing: 0.5px; white-space: nowrap;
+    display: flex; align-items: center; gap: 7px; cursor: pointer; transition: all 0.2s;
+}
+.hmi-hub-back-btn:hover { background: rgba(255, 204, 0, 0.15); border-color: var(--hmi-accent); }
+.hmi-hub-back-btn.active { background: var(--hmi-accent); border-color: var(--hmi-accent); color: #000; }
+.hmi-global-line {
+    display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 11px;
+    border: 1px solid var(--hmi-border); border-radius: 4px; background: #0b0b0b;
+    color: var(--hmi-text); font-family: var(--hmi-mono); font-size: 10px;
+    font-weight: 700; letter-spacing: 0.7px; white-space: nowrap;
+}
+.hmi-global-line::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--hmi-accent); box-shadow: 0 0 8px rgba(255, 204, 0, 0.9); flex: 0 0 auto; }
+.hmi-install-btn { height: 36px; padding: 0 11px; background: rgba(255, 204, 0, 0.08); border: 1px solid var(--hmi-accent); border-radius: 4px; color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.4px; white-space: nowrap; cursor: pointer; }
+.hmi-install-btn:hover { background: var(--hmi-accent); color: #000; }
+.hmi-stop-btn { width: 60px; height: 60px; border-radius: 50%; background-color: var(--hmi-danger); border: 4px solid #330000; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.hmi-stop-btn svg { width: 35px; height: 35px; fill: #fff; }
+.hmi-clock { display: flex; flex-direction: column; gap: 5px; font-family: var(--hmi-mono); font-size: 16px; text-align: right; }
+.hmi-clock > div { background: #000; border: 1px solid var(--hmi-border); padding: 4px 12px; color: var(--hmi-text); }
+
+/* ============================================================
+   РАБОЧАЯ ОБЛАСТЬ
+   ============================================================ */
+.hmi-workspace { flex: 1; position: relative; overflow: hidden; z-index: 1; background: transparent; }
+.hmi-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+.hmi-screen.active { opacity: 1; visibility: visible; animation: hmiFadeIn 0.4s ease-out forwards; }
+@keyframes hmiFadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+.hmi-screen-title { position: absolute; top: 20px; right: 30px; font-size: 20px; font-weight: 800; color: var(--hmi-text); text-transform: uppercase; background: #000; border: 2px solid var(--hmi-accent); padding: 8px 16px; border-radius: 4px; z-index: 10; }
+
+/* ============================================================
+   ХАБ: ВЫБОР УЗЛА ЛИНИИ
+   ============================================================ */
+.hmi-hub-wrap { width: 100%; height: 100%; overflow-y: auto; padding: 66px 40px 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; justify-content: safe center; gap: 24px; }
+.hmi-hub-heading { text-align: center; max-width: 780px; }
+.hmi-hub-kicker { font-family: var(--hmi-mono); font-size: 11px; letter-spacing: 2px; color: var(--hmi-text-dim); text-transform: uppercase; margin-bottom: 10px; }
+.hmi-hub-title { font-family: 'Arial Black', Impact, sans-serif; font-size: 34px; font-weight: 900; letter-spacing: 1.5px; color: var(--hmi-text); text-transform: uppercase; margin-bottom: 10px; }
+.hmi-hub-subtitle { color: var(--hmi-text-dim); font-size: 13px; line-height: 1.5; max-width: 620px; margin: 0 auto 14px; }
+.hmi-line-selector-wrap { width: 100%; max-width: 1240px; display: flex; flex-direction: column; gap: 8px; }
+.hmi-line-selector-label { font-family: var(--hmi-mono); font-size: 10px; letter-spacing: 1.6px; color: var(--hmi-text-dim); text-transform: uppercase; }
+.hmi-line-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
+.hmi-line-option {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    background: linear-gradient(140deg, #151515, #090909);
+    border: 2px solid var(--hmi-border); border-radius: 6px; color: var(--hmi-text);
+    font-family: var(--hmi-font); text-align: left; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.hmi-line-option:hover { border-color: rgba(255, 204, 0, 0.6); }
+.hmi-line-option.active { border-color: var(--hmi-accent); background: rgba(255, 204, 0, 0.07); box-shadow: 0 0 16px rgba(255, 204, 0, 0.12); }
+.hmi-line-option-code { font-family: var(--hmi-mono); font-size: 11px; font-weight: 700; color: var(--hmi-text-dim); border-right: 1px solid var(--hmi-border); padding-right: 12px; }
+.hmi-line-option.active .hmi-line-option-code { color: var(--hmi-accent); }
+.hmi-line-option-body { min-width: 0; }
+.hmi-line-option-body b { display: block; font-size: 13px; font-weight: 800; }
+.hmi-line-option-body small { display: block; margin-top: 2px; font-size: 10px; color: var(--hmi-text-dim); font-family: var(--hmi-mono); }
+.hmi-line-option-check { margin-left: auto; color: transparent; font-weight: 900; font-size: 16px; }
+.hmi-line-option.active .hmi-line-option-check { color: var(--hmi-accent); }
+.hmi-hub-grid { width: 100%; max-width: 1240px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.hmi-hub-card {
+    position: relative; overflow: hidden; min-height: 300px; padding: 22px;
+    background: linear-gradient(150deg, #151515 0%, #090909 100%);
+    border: 2px solid var(--hmi-border); border-radius: 10px; color: var(--hmi-text);
+    font-family: var(--hmi-font); text-align: left; cursor: pointer;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.hmi-hub-card::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--hmi-accent), transparent 75%); opacity: 0.55; }
+.hmi-hub-card:hover { transform: translateY(-5px); border-color: var(--hmi-accent); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), 0 0 18px rgba(255, 204, 0, 0.14); }
+.hmi-hub-card:hover .hmi-hub-card-icon { border-color: var(--hmi-accent); box-shadow: 0 0 14px rgba(255, 204, 0, 0.25); }
+.hmi-hub-card:active { transform: translateY(-2px); }
+.hmi-hub-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.hmi-hub-card-icon { width: 62px; height: 62px; border: 2px solid var(--hmi-border); border-radius: 12px; background: rgba(255, 204, 0, 0.04); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.hmi-hub-card-icon svg { width: 38px; height: 38px; fill: var(--hmi-accent); filter: drop-shadow(0 0 6px rgba(255, 204, 0, 0.35)); }
+.hmi-hub-status { font-family: var(--hmi-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.8px; padding: 5px 8px; border-radius: 3px; white-space: nowrap; }
+.hmi-hub-status-on { color: var(--hmi-accent); border: 1px solid rgba(255, 204, 0, 0.45); background: rgba(255, 204, 0, 0.08); }
+.hmi-hub-status-dev { color: var(--hmi-text-dim); border: 1px solid var(--hmi-border); background: rgba(255, 255, 255, 0.03); }
+.hmi-hub-card-title { font-size: 22px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; margin-top: 4px; }
+.hmi-hub-card-sub { font-family: var(--hmi-mono); font-size: 10px; letter-spacing: 1px; color: var(--hmi-accent); }
+.hmi-hub-card-desc { color: var(--hmi-text-dim); font-size: 12px; line-height: 1.5; flex: 1; }
+.hmi-hub-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--hmi-border); padding-top: 12px; font-family: var(--hmi-mono); font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--hmi-text); }
+.hmi-hub-arrow { color: var(--hmi-accent); font-size: 18px; line-height: 1; }
+.hmi-hub-card-disabled { opacity: 0.66; border-style: dashed; }
+.hmi-hub-card-disabled:hover { transform: none; box-shadow: none; border-color: var(--hmi-text-dim); }
+.hmi-hub-card-disabled .hmi-hub-arrow { color: var(--hmi-text-dim); }
+.hmi-hub-footer { width: 100%; max-width: 1240px; display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--hmi-border); padding-top: 14px; font-family: var(--hmi-mono); font-size: 10px; letter-spacing: 1px; color: var(--hmi-text-dim); text-transform: uppercase; }
+
+/* ============================================================
+   ЭЛЕМЕНТЫ ФОРМ
+   ============================================================ */
+.hmi-form-row { display: flex; align-items: center; gap: 15px; width: 100%; margin-bottom: 10px; }
+.hmi-input { width: 140px; height: 50px; background-color: var(--hmi-surface); border: 2px solid var(--hmi-border); border-radius: 4px; color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 20px; font-weight: bold; text-align: center; }
+.hmi-input:focus { outline: none; border-color: var(--hmi-accent); }
+.hmi-input:disabled { opacity: 0.45; cursor: not-allowed; }
+.hmi-label { flex: 1; font-size: 16px; color: var(--hmi-text); font-weight: 600; background: #1a1a1a; padding: 12px 20px; border-radius: 4px; border-left: 4px solid var(--hmi-border); }
+
+/* Экран замеров */
+.hmi-settings-scroll { width: 100%; flex: 1; overflow-y: auto; padding: 60px 40px 40px 40px; display: flex; justify-content: center; }
+.hmi-inputs-container { width: 100%; max-width: 600px; background: var(--hmi-panel); border: 1px solid var(--hmi-border); border-radius: 8px; padding: 30px; margin: 0 auto; height: max-content; }
+.hmi-section-title { font-size: 16px; color: var(--hmi-accent); text-transform: uppercase; margin-top: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--hmi-border); }
+.hmi-inputs-container .hmi-form-row { justify-content: space-between; }
+.hmi-inputs-container .hmi-label { flex: none; width: 250px; background: transparent; border: none; padding: 0; }
+.hmi-inputs-container .hmi-input { width: 180px; text-align: right; padding-right: 15px; }
+.hmi-line-readout {
+    width: 180px; height: 50px; display: flex; align-items: center; justify-content: flex-end;
+    padding: 0 15px; background: #0b0b0b; border: 1px dashed rgba(255, 204, 0, 0.45);
+    border-radius: 4px; color: var(--hmi-accent); font-family: var(--hmi-mono);
+    font-size: 11px; font-weight: 700; text-align: right; line-height: 1.3;
+}
+.hmi-calc-box { background: #000; border: 1px solid var(--hmi-border); padding: 15px; border-radius: 4px; }
+.hmi-calc-row { display: flex; justify-content: space-between; font-size: 16px; color: var(--hmi-text-dim); }
+.hmi-calc-row strong { color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 24px; }
+.hmi-btn-generate { width: 100%; background: var(--hmi-accent); color: #000; border: none; border-radius: 6px; padding: 20px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; text-transform: uppercase; }
+.hmi-btn-generate svg { width: 28px; height: 28px; fill: #000; }
+
+/* Экран колбы */
+.hmi-form-container { width: 100%; max-width: 700px; padding: 20px; display: flex; flex-direction: column; }
+.hmi-big-btn { width: 100%; height: 60px; background: rgba(255, 204, 0, 0.05); border: 2px solid var(--hmi-accent); color: var(--hmi-accent); font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-radius: 6px; cursor: pointer; }
+.hmi-arrow-right { width: 30px; height: 30px; fill: currentColor; }
+
+/* Экран форсунок */
+.hmi-nozzles-layout { display: flex; width: 100%; height: 100%; padding: 60px 40px 20px 40px; gap: 40px; }
+.hmi-nozzles-list { flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; max-width: 400px; }
+.hmi-nozzle-btn { width: 100%; height: 46px; background: var(--hmi-panel); border: 2px solid var(--hmi-border); border-radius: 4px; color: var(--hmi-text); font-size: 16px; font-weight: 600; text-align: left; padding: 0 20px; cursor: pointer; position: relative; transition: all 0.15s ease; }
+.hmi-nozzle-btn::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--hmi-text-dim); transition: background 0.15s; }
+.hmi-nozzle-btn:hover, .hmi-nozzle-btn:active { background: #222; border-color: var(--hmi-accent); color: var(--hmi-accent); transform: translateX(5px); }
+.hmi-nozzle-btn:hover::before, .hmi-nozzle-btn:active::before { background: var(--hmi-accent); }
+.hmi-nozzles-graphic { flex: 1; display: flex; align-items: center; justify-content: center; }
+.hmi-manifold { width: 120px; height: 450px; background: #0a0a0a; border: 2px solid var(--hmi-border); border-radius: 8px; position: relative; display: flex; flex-direction: column; justify-content: space-evenly; padding: 20px 0; }
+.hmi-manifold-label { position: absolute; top: 10px; right: 10px; font-family: var(--hmi-mono); font-size: 12px; color: var(--hmi-text-dim); border: 1px solid var(--hmi-border); padding: 2px 6px; border-radius: 3px; }
+.hmi-pipe { width: 80px; height: 14px; background: linear-gradient(90deg, var(--hmi-accent) 0%, #333 100%); border-radius: 0 4px 4px 0; margin-left: 120px; border: 1px solid #000; position: relative; }
+
+/* ЭКРАН НАСТРОЕК */
+.hmi-list-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 4px; padding-bottom: 20px; }
+.hmi-list-title { font-size: 14px; color: var(--hmi-accent); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
+.hmi-list-row { display: grid; grid-template-columns: 100px 1fr; gap: 10px; align-items: center; }
+.hmi-val-box { width: 100%; height: 36px; background: #000; border: 1px solid var(--hmi-border); color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 15px; text-align: right; padding-right: 10px; outline: none; }
+.hmi-val-box:focus { border-color: var(--hmi-accent); }
+.hmi-val-box.hmi-highlight { border-color: var(--hmi-accent); box-shadow: 0 0 5px rgba(255,204,0,0.3); }
+.hmi-text-box { background: #1a1a1a; border: 1px solid var(--hmi-border); padding: 8px 12px; font-size: 13px; color: var(--hmi-text); border-radius: 2px; height: 36px; display: flex; align-items: center; }
+
+/* ============================================================
+   МОДУЛЬ УКУПОРА
+   ============================================================ */
+.hmi-inputs-container .hmi-capper-select { width: 240px; font-size: 13px; text-align: left; padding-left: 12px; padding-right: 34px; }
+.hmi-field-note { font-size: 11px; color: var(--hmi-text-dim); line-height: 1.4; margin: -2px 0 14px 265px; font-family: var(--hmi-mono); }
+.hmi-capper-workspace { display: flex; align-items: flex-start; gap: 20px; width: 100%; max-width: 1040px; }
+.hmi-capper-workspace .hmi-list-container { flex: 1 1 560px; max-width: 620px; }
+.hmi-capper-aside { flex: 0 0 340px; display: flex; flex-direction: column; gap: 14px; }
+.hmi-telemetry-box { background: #0a0a0a; border: 1px solid var(--hmi-border); border-left: 4px solid var(--hmi-accent); border-radius: 6px; padding: 16px; }
+.hmi-telemetry-title { font-size: 12px; letter-spacing: 1.2px; color: var(--hmi-accent); text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
+.hmi-telemetry-main { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--hmi-border); padding-bottom: 12px; margin-bottom: 8px; }
+.hmi-telemetry-main span { color: var(--hmi-text-dim); font-size: 12px; }
+.hmi-telemetry-main strong { font-family: var(--hmi-mono); font-size: 34px; line-height: 1; color: var(--hmi-accent); text-shadow: 0 0 12px rgba(255, 204, 0, 0.25); }
+.hmi-telemetry-main small { color: var(--hmi-text-dim); font-family: var(--hmi-mono); font-size: 12px; }
+.hmi-telemetry-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 12px; color: var(--hmi-text-dim); padding: 4px 0; }
+.hmi-telemetry-row b { color: var(--hmi-text); font-family: var(--hmi-mono); font-size: 11px; font-weight: 600; text-align: right; max-width: 62%; }
+.hmi-clamp-hint { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--hmi-border); font-size: 11px; line-height: 1.5; color: var(--hmi-text-dim); }
+.hmi-notes-box { background: #0a0a0a; border: 1px solid var(--hmi-border); border-radius: 6px; padding: 16px; }
+.hmi-notes-title { font-size: 11px; letter-spacing: 1.2px; color: var(--hmi-text); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+.hmi-note-item { position: relative; padding: 5px 0 5px 14px; font-size: 11px; line-height: 1.5; color: var(--hmi-text-dim); }
+.hmi-note-item::before { content: "▸"; position: absolute; left: 0; top: 5px; color: var(--hmi-accent); }
+.hmi-note-item b { color: var(--hmi-text); font-weight: 600; }
+.hmi-warning-box { background: rgba(255, 42, 42, 0.08); border: 1px solid rgba(255, 42, 42, 0.45); border-left: 4px solid var(--hmi-danger); border-radius: 4px; padding: 12px; color: #ffb3b3; font-size: 11px; line-height: 1.5; }
+.is-ok { color: var(--hmi-accent) !important; }
+.is-warn { color: var(--hmi-danger) !important; }
+
+/* ============================================================
+   МОДУЛЬ ЭТИКЕТИРОВЩИКА: СИКОМ / KINCO
+   ============================================================ */
+.hmi-inline-check { display: flex; align-items: flex-start; gap: 9px; margin: 6px 0 4px; color: var(--hmi-text-dim); font-size: 11px; line-height: 1.45; cursor: pointer; }
+.hmi-inline-check input { width: 17px; height: 17px; margin-top: 1px; flex: 0 0 auto; accent-color: var(--hmi-accent); cursor: pointer; }
+.hmi-labeler-workspace { display: flex; align-items: flex-start; gap: 20px; width: 100%; max-width: 1120px; }
+.hmi-labeler-main { flex: 1 1 640px; max-width: 720px; display: flex; flex-direction: column; gap: 14px; }
+.hmi-instrument-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.hmi-instrument-card { background: #0a0a0a; border: 1px solid var(--hmi-border); border-left: 3px solid var(--hmi-accent); border-radius: 6px; padding: 12px 14px; }
+.hmi-instrument-card > span { display: block; font-size: 9px; letter-spacing: 0.8px; color: var(--hmi-text-dim); text-transform: uppercase; margin-bottom: 7px; }
+.hmi-instrument-card > div { display: flex; align-items: baseline; gap: 6px; }
+.hmi-instrument-card strong { font-family: var(--hmi-mono); font-size: 26px; line-height: 1; color: var(--hmi-accent); text-shadow: 0 0 10px rgba(255, 204, 0, 0.2); }
+.hmi-instrument-card small { font-family: var(--hmi-mono); font-size: 9px; color: var(--hmi-text-dim); }
+.hmi-instrument-card em { display: block; margin-top: 5px; font-style: normal; font-family: var(--hmi-mono); font-size: 8px; color: var(--hmi-text-dim); letter-spacing: 0.3px; }
+
+.kinco-panel { background: #06121f; border: 2px solid #1d4c73; border-radius: 8px; overflow: hidden; box-shadow: inset 0 0 30px rgba(0, 90, 180, 0.12); }
+.kinco-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; background: linear-gradient(90deg, #0b2a45, #06121f); border-bottom: 1px solid #1d4c73; }
+.kinco-brand { color: var(--hmi-accent); font-family: 'Arial Black', Impact, sans-serif; font-size: 18px; letter-spacing: 2px; }
+.kinco-series { color: #7fb6d9; font-size: 8px; letter-spacing: 1.4px; margin-left: 8px; }
+.kinco-status { color: #7fb6d9; font-family: var(--hmi-mono); font-size: 9px; letter-spacing: 0.6px; white-space: nowrap; }
+.kinco-screen { padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
+.kinco-row { display: grid; grid-template-columns: 1fr 180px; gap: 12px; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(29, 76, 115, 0.45); }
+.kinco-row:last-child { border-bottom: none; }
+.kinco-row > span { color: #b9d7ea; font-size: 12px; }
+.kinco-row > div { display: flex; align-items: center; gap: 6px; }
+.kinco-field { width: 100%; height: 34px; background: #0a3352; border: 1px solid #2b6f9e; border-radius: 2px; color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 17px; font-weight: 700; text-align: right; padding: 0 9px; }
+.kinco-row.kinco-main .kinco-field { height: 42px; font-size: 24px; border-color: var(--hmi-accent); box-shadow: 0 0 10px rgba(255, 204, 0, 0.1); }
+.kinco-row small { color: #7fb6d9; font-family: var(--hmi-mono); font-size: 9px; min-width: 32px; }
+.kinco-panel-footer { padding: 9px 14px; background: #04101b; border-top: 1px solid #1d4c73; color: #6f93aa; font-size: 9px; line-height: 1.45; }
+
+/* ============================================================
+   ЧЕК-ЛИСТЫ НАЛАДЧИКА
+   ============================================================ */
+.hmi-checklist-container { width: 100%; max-width: 820px; background: var(--hmi-panel); border: 1px solid var(--hmi-border); border-radius: 8px; padding: 26px; height: max-content; margin: 0 auto; }
+.hmi-checklist-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.hmi-checklist-title { font-size: 18px; font-weight: 900; color: var(--hmi-text); text-transform: uppercase; letter-spacing: 0.5px; }
+.hmi-checklist-subtitle { font-family: var(--hmi-mono); font-size: 10px; color: var(--hmi-text-dim); margin-top: 5px; }
+.hmi-checklist-progress { font-family: var(--hmi-mono); font-size: 16px; font-weight: 700; color: var(--hmi-accent); border: 1px solid rgba(255, 204, 0, 0.45); background: rgba(255, 204, 0, 0.06); padding: 6px 10px; border-radius: 3px; white-space: nowrap; }
+.hmi-checklist-bar { height: 5px; background: #000; border: 1px solid var(--hmi-border); border-radius: 2px; margin: 14px 0 16px; overflow: hidden; }
+.hmi-checklist-bar-fill { height: 100%; width: 0; background: var(--hmi-accent); box-shadow: 0 0 8px rgba(255, 204, 0, 0.6); transition: width 0.25s ease; }
+.hmi-check-item { display: grid; grid-template-columns: 20px 30px 1fr; gap: 10px; align-items: start; padding: 11px 12px; margin-bottom: 8px; background: #0b0b0b; border: 1px solid var(--hmi-border); border-radius: 4px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.hmi-check-item:hover { border-color: rgba(255, 204, 0, 0.6); }
+.hmi-check-item.is-checked { border-color: var(--hmi-accent); background: rgba(255, 204, 0, 0.06); }
+.hmi-check-box { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--hmi-accent); cursor: pointer; }
+.hmi-check-num { font-family: var(--hmi-mono); font-size: 11px; color: var(--hmi-text-dim); padding-top: 3px; }
+.hmi-check-item.is-checked .hmi-check-num { color: var(--hmi-accent); }
+.hmi-check-body b { display: block; font-size: 13px; line-height: 1.3; color: var(--hmi-text); }
+.hmi-check-body small { display: block; margin-top: 3px; font-size: 11px; line-height: 1.45; color: var(--hmi-text-dim); }
+
+/* ============================================================
+   БИБЛИОТЕКА РЕЦЕПТОВ
+   ============================================================ */
+.hmi-hub-recipes { width: 100%; max-width: 1240px; background: #0a0a0a; border: 1px solid var(--hmi-border); border-left: 3px solid var(--hmi-accent); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.hmi-hub-recipes-head { display: flex; align-items: center; gap: 8px; }
+.hmi-hub-recipes-title { font-family: var(--hmi-mono); font-size: 10px; letter-spacing: 1px; color: var(--hmi-accent); text-transform: uppercase; font-weight: 700; }
+.hmi-hub-recipes-preview { flex: 1; min-width: 180px; font-family: var(--hmi-mono); font-size: 10px; color: var(--hmi-text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hmi-hub-recipes-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.hmi-recipe-count { font-family: var(--hmi-mono); font-size: 10px; font-weight: 700; color: var(--hmi-accent); border: 1px solid rgba(255, 204, 0, 0.45); background: rgba(255, 204, 0, 0.06); padding: 2px 6px; border-radius: 3px; }
+.hmi-recipe-panel { margin-top: 16px; background: #0a0a0a; border: 1px solid var(--hmi-border); border-left: 3px solid var(--hmi-accent); border-radius: 6px; padding: 14px; }
+.hmi-recipe-panel-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-family: var(--hmi-mono); font-size: 10px; letter-spacing: 0.8px; color: var(--hmi-accent); text-transform: uppercase; font-weight: 700; }
+.hmi-recipe-panel-note { font-size: 10px; color: var(--hmi-text-dim); margin: 5px 0 10px; line-height: 1.4; }
+.hmi-recipe-panel-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.hmi-recipe-name { flex: 1 1 150px; min-width: 120px; height: 36px; background: #000; border: 1px solid var(--hmi-border); border-radius: 3px; color: var(--hmi-text); padding: 0 10px; font-family: var(--hmi-mono); font-size: 12px; outline: none; }
+.hmi-recipe-name:focus { border-color: var(--hmi-accent); }
+.hmi-recipe-btn { height: 36px; padding: 0 12px; background: var(--hmi-accent); color: #000; border: none; border-radius: 3px; font-size: 10px; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; cursor: pointer; }
+.hmi-recipe-btn:hover { background: var(--hmi-accent-hover); }
+.hmi-recipe-btn-ghost { background: transparent; color: var(--hmi-accent); border: 1px solid rgba(255, 204, 0, 0.45); }
+.hmi-recipe-btn-ghost:hover { background: rgba(255, 204, 0, 0.1); }
+
+.hmi-recipes-modal { max-width: 800px; }
+.hmi-recipes-toolbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.hmi-recipes-filters, .hmi-recipes-io { display: flex; gap: 5px; flex-wrap: wrap; }
+.hmi-recipes-filter { height: 32px; padding: 0 10px; background: #111; border: 1px solid var(--hmi-border); color: var(--hmi-text-dim); border-radius: 3px; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+.hmi-recipes-filter.active { border-color: var(--hmi-accent); color: var(--hmi-accent); background: rgba(255, 204, 0, 0.08); }
+.hmi-recipes-list { display: flex; flex-direction: column; gap: 6px; max-height: 50vh; overflow-y: auto; padding-right: 4px; }
+.hmi-recipe-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #0b0b0b; border: 1px solid var(--hmi-border); border-radius: 4px; padding: 10px 12px; }
+.hmi-recipe-row:hover { border-color: rgba(255, 204, 0, 0.55); }
+.hmi-recipe-info { min-width: 0; }
+.hmi-recipe-row-name { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; font-weight: 700; color: var(--hmi-text); }
+.hmi-recipe-badge { font-family: var(--hmi-mono); font-size: 8px; color: var(--hmi-accent); border: 1px solid rgba(255, 204, 0, 0.45); padding: 2px 5px; border-radius: 2px; text-transform: uppercase; }
+.hmi-recipe-row-meta { font-family: var(--hmi-mono); font-size: 9px; color: var(--hmi-text-dim); margin-top: 4px; }
+.hmi-recipe-row-actions { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; }
+.hmi-recipe-load { height: 30px; padding: 0 10px; background: rgba(255, 204, 0, 0.1); border: 1px solid var(--hmi-accent); color: var(--hmi-accent); border-radius: 3px; font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.hmi-recipe-del { width: 30px; height: 30px; background: transparent; border: 1px solid rgba(255, 42, 42, 0.55); color: var(--hmi-danger); border-radius: 3px; font-size: 13px; cursor: pointer; }
+.hmi-recipes-empty { color: var(--hmi-text-dim); font-size: 12px; text-align: center; padding: 24px; border: 1px dashed var(--hmi-border); border-radius: 4px; }
+.hmi-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 20000; max-width: 90vw; background: #0a0a0a; border: 1px solid var(--hmi-accent); border-left: 4px solid var(--hmi-accent); color: var(--hmi-text); padding: 12px 18px; border-radius: 4px; font-size: 13px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+.hmi-toast.is-error { border-color: var(--hmi-danger); border-left-color: var(--hmi-danger); color: #ffb3b3; }
+.hmi-file-input { position: fixed; left: -9999px; top: 0; width: 1px; height: 1px; opacity: 0; }
+.hmi-hub-status-sim { color: var(--hmi-accent); border: 1px solid var(--hmi-accent); background: rgba(255, 204, 0, 0.12); }
+
+/* ============================================================
+   СИМУЛЯТОР / ТРЕНАЖЁР
+   ============================================================ */
+.hmi-sim-container { width: 100%; max-width: 1000px; background: var(--hmi-panel); border: 1px solid var(--hmi-border); border-radius: 8px; padding: 26px; height: max-content; margin: 0 auto; }
+.hmi-sim-intro { text-align: center; margin-bottom: 20px; }
+.hmi-sim-title { font-family: 'Arial Black', Impact, sans-serif; font-size: 30px; font-weight: 900; color: var(--hmi-text); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.hmi-sim-subtitle { color: var(--hmi-text-dim); font-size: 12px; line-height: 1.5; max-width: 680px; margin: 0 auto; }
+.hmi-sim-mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin: 20px 0; }
+.hmi-sim-mode { display: flex; flex-direction: column; gap: 7px; padding: 18px; background: linear-gradient(145deg, #151515, #090909); border: 2px solid var(--hmi-border); border-radius: 6px; color: var(--hmi-text); text-align: left; font-family: var(--hmi-font); cursor: pointer; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; }
+.hmi-sim-mode:hover { border-color: var(--hmi-accent); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); }
+.hmi-sim-mode-icon { font-family: var(--hmi-mono); font-size: 9px; letter-spacing: 1px; color: var(--hmi-accent); }
+.hmi-sim-mode b { font-size: 16px; font-weight: 800; }
+.hmi-sim-mode small { color: var(--hmi-text-dim); font-size: 11px; line-height: 1.45; }
+.hmi-sim-topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--hmi-border); padding-bottom: 12px; margin-bottom: 14px; }
+.hmi-sim-topbar-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hmi-sim-mode-label { font-family: var(--hmi-mono); font-size: 11px; letter-spacing: 0.8px; color: var(--hmi-accent); text-transform: uppercase; }
+.hmi-sim-timer { font-family: var(--hmi-mono); font-size: 13px; font-weight: 700; color: var(--hmi-accent); border: 1px solid rgba(255, 204, 0, 0.45); background: rgba(255, 204, 0, 0.06); padding: 4px 8px; border-radius: 3px; }
+.hmi-sim-timer.is-danger { color: var(--hmi-danger); border-color: var(--hmi-danger); background: rgba(255, 42, 42, 0.08); }
+.hmi-sim-task-title { font-size: 18px; font-weight: 900; color: var(--hmi-text); text-transform: uppercase; margin-bottom: 7px; }
+.hmi-sim-task-brief { font-size: 12px; line-height: 1.55; color: var(--hmi-text-dim); }
+.hmi-sim-brief .hmi-warning-box { margin-top: 10px; }
+.hmi-sim-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+.hmi-sim-field { background: #0b0b0b; border: 1px solid var(--hmi-border); border-radius: 4px; padding: 11px 12px; transition: border-color 0.2s, box-shadow 0.2s; }
+.hmi-sim-field label { display: block; font-size: 11px; color: var(--hmi-text); margin-bottom: 6px; }
+.hmi-sim-input-row { display: flex; align-items: center; gap: 6px; }
+.hmi-sim-input { width: 100%; height: 38px; background: #000; border: 1px solid var(--hmi-border); border-radius: 3px; color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 18px; font-weight: 700; text-align: right; padding: 0 10px; outline: none; }
+.hmi-sim-input:focus { border-color: var(--hmi-accent); }
+.hmi-sim-unit { min-width: 34px; font-family: var(--hmi-mono); font-size: 9px; color: var(--hmi-text-dim); }
+.hmi-sim-field-feedback { margin-top: 6px; font-size: 10px; line-height: 1.45; color: var(--hmi-text-dim); }
+.hmi-sim-field.is-perfect { border-color: #39ff88; box-shadow: 0 0 10px rgba(57, 255, 136, 0.08); }
+.hmi-sim-field.is-perfect .hmi-sim-input { border-color: #39ff88; color: #39ff88; }
+.hmi-sim-field.is-perfect .hmi-sim-field-feedback { color: #39ff88; }
+.hmi-sim-field.is-pass { border-color: var(--hmi-accent); }
+.hmi-sim-field.is-pass .hmi-sim-input { border-color: var(--hmi-accent); color: var(--hmi-accent); }
+.hmi-sim-field.is-pass .hmi-sim-field-feedback { color: var(--hmi-accent); }
+.hmi-sim-field.is-fail { border-color: var(--hmi-danger); box-shadow: 0 0 10px rgba(255, 42, 42, 0.08); }
+.hmi-sim-field.is-fail .hmi-sim-input { border-color: var(--hmi-danger); color: var(--hmi-danger); }
+.hmi-sim-field.is-fail .hmi-sim-field-feedback { color: #ffb3b3; }
+.hmi-sim-actions { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.hmi-sim-actions > * { flex: 1 1 180px; }
+.hmi-sim-actions .hmi-btn-generate, .hmi-sim-actions .hmi-big-btn { padding: 14px 16px; height: 52px; font-size: 13px; }
+.hmi-sim-result-head { display: flex; align-items: center; gap: 22px; border-bottom: 1px solid var(--hmi-border); padding-bottom: 16px; margin-bottom: 14px; }
+.hmi-sim-score-wrap { flex: 0 0 auto; text-align: center; }
+.hmi-sim-score { font-family: var(--hmi-mono); font-size: 64px; font-weight: 800; line-height: 0.9; color: var(--hmi-accent); }
+.hmi-sim-score.is-perfect { color: #39ff88; }
+.hmi-sim-score.is-pass { color: var(--hmi-accent); }
+.hmi-sim-score.is-fail { color: var(--hmi-danger); }
+.hmi-sim-score-label { font-family: var(--hmi-mono); font-size: 9px; color: var(--hmi-text-dim); text-transform: uppercase; margin-top: 5px; }
+.hmi-sim-result-title { font-size: 26px; font-weight: 900; color: var(--hmi-text); text-transform: uppercase; line-height: 1.1; }
+.hmi-sim-result-sub { font-size: 11px; color: var(--hmi-text-dim); line-height: 1.45; margin-top: 5px; }
+.hmi-sim-breakdown { display: flex; flex-direction: column; gap: 6px; max-height: 42vh; overflow-y: auto; padding-right: 4px; }
+.hmi-sim-breakdown-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; background: #0b0b0b; border: 1px solid var(--hmi-border); border-left: 4px solid var(--hmi-border); border-radius: 4px; padding: 10px 12px; }
+.hmi-sim-breakdown-row.is-perfect { border-left-color: #39ff88; }
+.hmi-sim-breakdown-row.is-pass { border-left-color: var(--hmi-accent); }
+.hmi-sim-breakdown-row.is-fail { border-left-color: var(--hmi-danger); }
+.hmi-sim-breakdown-name { font-size: 12px; font-weight: 700; color: var(--hmi-text); }
+.hmi-sim-breakdown-detail { font-size: 10px; line-height: 1.45; color: var(--hmi-text-dim); margin-top: 4px; }
+.hmi-sim-breakdown-row b { flex: 0 0 auto; font-family: var(--hmi-mono); font-size: 11px; color: var(--hmi-accent); }
+
+/* Модальное окно */
+.hmi-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+.hmi-modal { background: #0a0a0a; border: 2px solid var(--hmi-accent); border-radius: 8px; width: 90%; max-width: 500px; animation: hmiModalPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.hmi-modal.hmi-recipes-modal { max-width: 800px; }
+@keyframes hmiModalPopIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.hmi-modal-header { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 15px 20px; border-bottom: 1px solid var(--hmi-border); border-radius: 6px 6px 0 0; }
+.hmi-modal-header h3 { color: var(--hmi-accent); text-transform: uppercase; }
+.hmi-modal-close { background: transparent; border: none; color: var(--hmi-text-dim); font-size: 20px; cursor: pointer; }
+.hmi-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+.hmi-modal-input { width: 100%; height: 45px; background: #1a1a1a; border: 1px solid var(--hmi-border); border-radius: 4px; color: var(--hmi-accent); font-family: var(--hmi-mono); font-size: 18px; padding: 0 15px; }
+.hmi-modal-footer { padding: 15px 20px; background: #111; border-top: 1px solid var(--hmi-border); border-radius: 0 0 6px 6px; display: flex; justify-content: flex-end; }
+.hmi-btn-save { background: var(--hmi-accent); color: #000; border: none; border-radius: 4px; padding: 10px 20px; font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+/* Дополнительные стили для выпадающего списка */
+.hmi-select { text-align: left; padding-left: 15px; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23ffcc00%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 24px; }
+.hmi-select option { background-color: var(--hmi-panel); color: var(--hmi-text); }
+
+/* ============================================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ
+   ============================================================ */
+@media (max-width: 768px) {
+    .splash-logo-box { padding: 30px 40px; border-radius: 16px; }
+    .splash-title-top { font-size: 2rem; letter-spacing: 15px; margin-right: -15px; }
+    .splash-logo-gc { font-size: 6rem; }
+    .logo-c { margin-left: -15px; }
+    .splash-subtitle { font-size: 0.6rem; letter-spacing: 6px; margin-right: -6px; }
+
+    .hmi-container { flex-direction: column-reverse; height: 100dvh; }
+    .hmi-sidebar {
+        width: 100%; height: 70px; flex-direction: row; justify-content: space-around;
+        border-right: none; border-top: 2px solid var(--hmi-border); padding-top: 0;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .hmi-nav-group { flex-direction: row; gap: 12px; width: auto; }
+    .hmi-nav-btn { width: 50px; height: 50px; }
+    .hmi-nav-btn svg { width: 24px; height: 24px; }
+    .hmi-nav-btn-labeled { width: 58px; height: 56px; }
+    .hmi-nav-label { font-size: 7px; }
+
+    .hmi-header { flex-wrap: wrap; padding: 10px; gap: 8px; justify-content: space-between; }
+    .hmi-header-brand { gap: 8px; flex: 1 1 auto; flex-wrap: wrap; }
+    .hmi-header-logo { margin-right: 0; font-size: 20px; }
+    .hmi-hub-back-btn { height: 32px; padding: 0 9px; font-size: 9px; letter-spacing: 0.2px; }
+    .hmi-global-line { height: 30px; padding: 0 7px; font-size: 8px; letter-spacing: 0.3px; }
+    .hmi-install-btn { height: 30px; padding: 0 8px; font-size: 8px; }
+    .hmi-install-label { display: none; }
+    .hmi-stop-btn { width: 50px; height: 50px; margin: 0; }
+    .hmi-clock { width: 100%; flex-direction: row; justify-content: space-between; font-size: 14px; text-align: center; }
+
+    .hmi-hub-wrap { padding: 20px 12px 24px; justify-content: flex-start; gap: 16px; }
+    .hmi-hub-title { font-size: 24px; letter-spacing: 0.8px; }
+    .hmi-hub-subtitle { font-size: 12px; }
+    .hmi-line-selector { grid-template-columns: 1fr; }
+    .hmi-line-option { padding: 10px 12px; }
+    .hmi-hub-card { min-height: 0; padding: 18px; }
+    .hmi-hub-card-title { font-size: 19px; }
+    .hmi-hub-card-icon { width: 52px; height: 52px; }
+    .hmi-hub-card-icon svg { width: 32px; height: 32px; }
+    .hmi-hub-footer { flex-direction: column; gap: 6px; }
+
+    .hmi-screen { flex-direction: column; justify-content: flex-start; padding-top: 10px; }
+    .hmi-screen-title { position: static; margin: 0 auto 15px auto; width: max-content; font-size: 16px; text-align: center; }
+
+    .hmi-settings-scroll { padding: 0 10px 20px 10px; display: block; }
+    .hmi-inputs-container { width: 100%; max-width: 100%; padding: 15px; margin: 0; border-radius: 8px; }
+    
+    .hmi-inputs-container .hmi-form-row { flex-direction: column; align-items: flex-start; gap: 5px; margin-bottom: 15px; }
+    .hmi-inputs-container .hmi-label { width: 100%; margin-bottom: 0; font-size: 14px; }
+    .hmi-inputs-container .hmi-input { width: 100%; text-align: left; font-size: 18px; padding-left: 15px; }
+    .hmi-inputs-container .hmi-capper-select { width: 100%; font-size: 14px; padding-right: 34px; }
+    .hmi-line-readout { width: 100%; justify-content: flex-start; text-align: left; font-size: 10px; }
+    .hmi-field-note { margin: -6px 0 14px 0; }
+    .hmi-select { text-align: left; }
+
+    .hmi-capper-workspace { flex-direction: column; gap: 14px; }
+    .hmi-capper-workspace .hmi-list-container { max-width: 100%; width: 100%; }
+    .hmi-capper-aside { flex: 1 1 auto; width: 100%; }
+    .hmi-telemetry-main strong { font-size: 30px; }
+
+    .hmi-labeler-workspace { flex-direction: column; gap: 14px; }
+    .hmi-labeler-main { width: 100%; max-width: 100%; }
+    .hmi-instrument-grid { grid-template-columns: 1fr 1fr; }
+    .hmi-instrument-card { padding: 10px; }
+    .hmi-instrument-card strong { font-size: 22px; }
+    .kinco-row { grid-template-columns: 1fr 120px; gap: 8px; }
+    .kinco-field { height: 30px; font-size: 14px; }
+    .kinco-row.kinco-main .kinco-field { height: 38px; font-size: 20px; }
+    .kinco-panel-header { flex-wrap: wrap; }
+    .kinco-status { font-size: 8px; }
+
+    .hmi-checklist-container { padding: 15px; }
+    .hmi-checklist-header { flex-direction: column; gap: 10px; }
+    .hmi-checklist-title { font-size: 16px; }
+    .hmi-checklist-progress { align-self: flex-start; font-size: 14px; }
+    .hmi-check-item { grid-template-columns: 18px 24px 1fr; gap: 8px; padding: 10px; }
+    .hmi-check-body b { font-size: 12px; }
+    .hmi-check-body small { font-size: 10px; }
+
+    .hmi-hub-recipes { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .hmi-hub-recipes-preview { white-space: normal; min-width: 0; }
+    .hmi-recipe-panel-actions { align-items: stretch; }
+    .hmi-recipe-name { width: 100%; flex: 1 1 auto; }
+    .hmi-recipe-panel-actions .hmi-recipe-btn { flex: 1; }
+    .hmi-recipes-toolbar { flex-direction: column; }
+    .hmi-recipes-filters, .hmi-recipes-io { width: 100%; }
+    .hmi-recipes-filter, .hmi-recipes-io .hmi-recipe-btn { flex: 1; }
+    .hmi-recipe-row { flex-direction: column; align-items: flex-start; }
+    .hmi-recipe-row-actions { width: 100%; justify-content: flex-end; }
+
+    .hmi-sim-container { padding: 15px; }
+    .hmi-sim-title { font-size: 22px; }
+    .hmi-sim-mode-grid { grid-template-columns: 1fr; }
+    .hmi-sim-fields { grid-template-columns: 1fr; }
+    .hmi-sim-topbar { align-items: flex-start; }
+    .hmi-sim-result-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .hmi-sim-score { font-size: 50px; }
+    .hmi-sim-actions { flex-direction: column; }
+    .hmi-sim-breakdown-row { flex-direction: column; }
+
+    .hmi-form-container { padding: 10px; align-items: flex-start !important; }
+    .hmi-form-container .hmi-form-row { flex-direction: column; align-items: flex-start; }
+    .hmi-form-container .hmi-input { width: 100%; text-align: left; }
+    
+    .hmi-nozzles-layout { flex-direction: column; padding: 10px; gap: 10px; }
+    .hmi-nozzles-graphic { display: none; }
+    .hmi-nozzles-list { max-width: 100%; width: 100%; }
+
+    .hmi-list-container { max-width: 100%; padding: 10px; }
+    .hmi-list-row { grid-template-columns: 90px 1fr; gap: 5px; }
+    .hmi-val-box { font-size: 14px; height: 32px; }
+    .hmi-text-box { font-size: 12px; height: 32px; padding: 4px 8px; }
+
+    /* На мобильных делаем фигуры менее навязчивыми, чтобы не перекрывать текст */
+    .neon-shape { opacity: 0.2; }
+}
